@@ -3,7 +3,6 @@
 // no stockpile
 // no foundation
 
-
 import { useRef, useEffect } from 'react';
 import Phaser from 'phaser';
 
