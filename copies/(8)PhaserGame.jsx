@@ -1,3 +1,11 @@
+// tableaux free dnd
+// stockpile dnd of topcard only
+// foundations
+// no solitaire dnd rules
+// card images and labels
+// can only DnD card to foundations boxes
+// drops to foundation in correct order
+
 import { useRef, useEffect } from 'react';
 import Phaser from 'phaser';
 
