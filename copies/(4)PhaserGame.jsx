@@ -1,3 +1,8 @@
+// tableaux free dnd
+// stockpile dnd of topcard only
+// no foundation
+// no solitaire dnd rules
+
 import { useRef, useEffect } from 'react';
 import Phaser from 'phaser';
 
