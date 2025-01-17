@@ -44,9 +44,30 @@ const PhaserGame = () => {
     return card;
   }
 
+// FOUNDATIONS
+
+  // Function to create foundation boxes
+  function createFoundationBox(scene, x, y, index) {
+    const box = scene.add.graphics({ x, y });
+    box.fillStyle(0xeeeeee, 1); // Light gray fill
+    box.lineStyle(2, 0xffffff, 1); // Black outline
+    //box.fillRect(0, 0, 70, 100); // Box size: 0,0, w, h
+    box.strokeRect(0, 0, 70, 100); // Outline
+
+    // Add a label to indicate foundation (optional)
+    const label = scene.add.text(x + 35, y + 10, `F${index + 1}`, {
+      fontSize: '16px',
+      color: 'white',
+      align: 'center',
+    }).setOrigin(0.5);
+
+    return box;
+  }
+
   function create() {
     const deck = []; // Deck for tableaux
     const stockpile = []; // Stockpile
+    const foundations = []; // Foundations for the game
 
     const rows = 7;
     const cols = 7;
@@ -86,12 +107,19 @@ const PhaserGame = () => {
         if (col >= row) {
           const x = startX + col * spacingX;
           const y = startY + row * spacingY;
-
           const card = createCard(this, x, y, row * cols + col);
           this.input.setDraggable(card); // Make tableaux cards draggable
           deck.push(card);
         }
       }
+    }
+
+    // Create foundation boxes
+    const foundationX = 150;
+    const foundationY = 90;
+    for (let i = 0; i < 4; i++) {
+      const box = createFoundationBox(this, foundationX + i * 100, foundationY, i);
+      foundations.push(box);
     }
 
     // Event: Drag start
