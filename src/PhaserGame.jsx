@@ -8,8 +8,8 @@ const PhaserGame = () => {
     const config = {
       type: Phaser.AUTO,
       parent: 'phaser-container',
-      width: 800,
-      height: 700,
+      width: 595,
+      height: 1000,
       backgroundColor: '#38c940', // green background 
       scene: {
         preload,
@@ -35,37 +35,49 @@ const PhaserGame = () => {
   function create() {
     // Create a deck of cards and tableaux layout
     const deck = []; // start with an empty deck; fill with cards per below 
+    //initialize STOCKPILE
+    const stockpile = [];
     const rows = 7; // number of rows
     const cols = 7; // number of columns
     const spacingX = 70; // Horizontal spacing
     const spacingY = 40; // Vertical spacing
-    const startX = 300; // Starting X position
+    const startX = 80; // Starting X position
     const startY = 300; // Starting Y position
   
+    // Stockpile spacing
+    const stockpileX = 80; // X position for the stockpile
+    const stockpileY = 160; // Y position for the stockpile
+
+    for (let i = 0; i < 10; i++) {
+      // Create 10 cards for the stockpile
+      const card = this.add.graphics({ x: stockpileX, y: stockpileY - i * 5 }); // Offset each card slightly
+      card.fillStyle(0xffffff, 1); // White fill
+      card.lineStyle(1, 0x000000, 1); // Black outline
+      card.fillRect(-30, -45, 60, 90); // Card size
+      card.strokeRect(-30, -45, 60, 90); // Outline
+
+      card.setInteractive(new Phaser.Geom.Rectangle(-30, -45, 60, 90), Phaser.Geom.Rectangle.Contains);
+      card.setData('index', i); // Store index for reference
+
+      stockpile.push(card);
+    }
+
+    // Tableaux layout
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
-        if (col >= row) { // Ensure only to show the correct number of cards in each row
+        if (col >= row) {
           const x = startX + col * spacingX;
           const y = startY + row * spacingY;
-    
-          // Create a white card using Phaser.Graphics
+
           const card = this.add.graphics({ x, y });
-    
-          // Set outline color and width
-          card.lineStyle(1, 0x000000, 1); // Black outline with width of 4
-    
-          // Draw rectangle (card) with the outline
-          card.fillStyle(0xffffff, 1); // White color for the fill
-          card.fillRect(-30, -45, 60, 90); // Card dimensions halved (width: 60, height: 90)
-          
-          // Add outline around the card
-          card.strokeRect(-30, -45, 60, 90); // Stroke the same rectangle to add an outline
-    
-          card.setInteractive(new Phaser.Geom.Rectangle(-30, -45, 60, 90), Phaser.Geom.Rectangle.Contains); // Set interactivity
-    
-          card.setData('index', row * cols + col); // Store card index for reference
-    
-          // Enable dragging
+          card.fillStyle(0xffffff, 1);
+          card.lineStyle(1, 0x000000, 1);
+          card.fillRect(-30, -45, 60, 90);
+          card.strokeRect(-30, -45, 60, 90);
+
+          card.setInteractive(new Phaser.Geom.Rectangle(-30, -45, 60, 90), Phaser.Geom.Rectangle.Contains);
+          card.setData('index', row * cols + col);
+
           this.input.setDraggable(card);
           deck.push(card);
         }
@@ -74,19 +86,25 @@ const PhaserGame = () => {
 
     // Event: Drag start
     this.input.on('dragstart', (pointer, gameObject) => {
-      gameObject.setScale(1.1); // Scale up for effect
-      gameObject.setDepth(1); // Bring to front
+      gameObject.setScale(1.1);
+      gameObject.setDepth(1);
     });
 
     // Event: Dragging
     this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
-      gameObject.setPosition(dragX, dragY); // Update position
+      gameObject.setPosition(dragX, dragY);
     });
 
     // Event: Drag end
     this.input.on('dragend', (pointer, gameObject) => {
-      gameObject.setScale(1); // Reset scale
-      gameObject.setDepth(0); // Reset depth
+      gameObject.setScale(1);
+      gameObject.setDepth(0);
+
+      // Example: Snap back to stockpile if dropped near stockpile
+      const distance = Phaser.Math.Distance.Between(gameObject.x, gameObject.y, stockpileX, stockpileY);
+      if (distance < 50) {
+        gameObject.setPosition(stockpileX, stockpileY);
+      }
     });
   }
 
@@ -94,9 +112,7 @@ const PhaserGame = () => {
     // Game loop (not used here but can be expanded for interactions)
   }
 
-  return (
-    <div id="phaser-container"/>
-  );
+  return <div id="phaser-container" />;
 };
 
 export default PhaserGame;
