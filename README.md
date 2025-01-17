@@ -18,3 +18,10 @@ Currently, two official plugins are available:
 ## Tech Used:
 + react-router
 + phaser
+
+
+
+
+
+
+The first solitaire I made took 2 weeks to build. This one took xx (currently 2) days.
