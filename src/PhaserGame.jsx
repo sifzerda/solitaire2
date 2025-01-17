@@ -46,10 +46,10 @@ const PhaserGame = () => {
   
     // Stockpile spacing
     const stockpileX = 80; // X position for the stockpile
-    const stockpileY = 160; // Y position for the stockpile
+    const stockpileY = 190; // Y position for the stockpile
 
-    for (let i = 0; i < 10; i++) {
-      // Create 10 cards for the stockpile
+    for (let i = 0; i < 24; i++) {
+      // Create 24 cards for the stockpile
       const card = this.add.graphics({ x: stockpileX, y: stockpileY - i * 5 }); // Offset each card slightly
       card.fillStyle(0xffffff, 1); // White fill
       card.lineStyle(1, 0x000000, 1); // Black outline
