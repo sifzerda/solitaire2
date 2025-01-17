@@ -13,7 +13,7 @@
 + [ ] make sub-level tableaux cards facedown
 + [ ] click to cycle stockpile cards and loop
 
-### LATER:
+### Later:
 + [ ] add card images (later)
 + [ ] create start screen
 + [ ] create end game (show score and moves) page
