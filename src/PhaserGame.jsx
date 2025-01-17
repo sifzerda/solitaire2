@@ -8,9 +8,9 @@ const PhaserGame = () => {
     const config = {
       type: Phaser.AUTO,
       parent: 'phaser-container',
-      width: 1200,
-      height: 1000,
-      backgroundColor: '#87CEEB', // Light blue background for 2D game
+      width: 800,
+      height: 700,
+      backgroundColor: '#38c940', // green background 
       scene: {
         preload,
         create,
@@ -27,18 +27,20 @@ const PhaserGame = () => {
   }, []);
 
   function preload() {
-    // No need to load an image, we'll use a Phaser Graphics object for the card
+    // You can load images, audio, spritesheets, etc. here
   }
 
+  //TABLEAUX
+
   function create() {
-    // Create a deck of cards
-    const deck = [];
-    const rows = 7; // Increase number of rows for a more solitaire-like layout
-    const cols = 7; // Keep the number of columns consistent for symmetry
-    const spacingX = 140; // Horizontal spacing
-    const spacingY = 180; // Vertical spacing
-    const startX = 100; // Starting X position
-    const startY = 150; // Starting Y position
+    // Create a deck of cards and tableaux layout
+    const deck = []; // start with an empty deck; fill with cards per below 
+    const rows = 7; // number of rows
+    const cols = 7; // number of columns
+    const spacingX = 70; // Horizontal spacing
+    const spacingY = 40; // Vertical spacing
+    const startX = 300; // Starting X position
+    const startY = 300; // Starting Y position
   
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
@@ -93,15 +95,7 @@ const PhaserGame = () => {
   }
 
   return (
-    <div
-      id="phaser-container"
-      style={{
-        width: '1200px',
-        height: '1000px',
-        margin: '0 auto',
-        border: '2px solid black',
-      }}
-    />
+    <div id="phaser-container"/>
   );
 };
 
