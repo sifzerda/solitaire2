@@ -1,5 +1,7 @@
+// PhaserGame.js
 import { useRef, useEffect } from 'react';
 import Phaser from 'phaser';
+import { createFoundationBox } from './foundations'; // Import the foundation functions
 
 const PhaserGame = () => {
   const gameRef = useRef(null);
@@ -33,12 +35,12 @@ const PhaserGame = () => {
 
     ranks.forEach(rank => {
       suits.forEach(suit => {
-        // Load each card image dynamically
         this.load.image(`${rank}_${suit}`, `/assets/cards/${rank}_${suit}.png`);
       });
     });
   }
 
+  // Card creation logic
   function createCard(scene, x, y, index) {
     const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
     const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
@@ -77,26 +79,6 @@ const PhaserGame = () => {
     cardContainer.setData('index', index); // Store index for reference
 
     return cardContainer; // Return the container instead of just the card
-  }
-
-  // FOUNDATIONS
-
-  // Function to create foundation boxes
-  function createFoundationBox(scene, x, y, index) {
-    const box = scene.add.graphics({ x, y });
-    box.fillStyle(0xeeeeee, 1); // Light gray fill
-    box.lineStyle(2, 0xffffff, 1); // Black outline
-    //box.fillRect(0, 0, 70, 100); // Box size: 0,0, w, h
-    box.strokeRect(0, 0, 70, 100); // Outline
-
-    // Add a label to indicate foundation (optional)
-    const label = scene.add.text(x + 35, y + 10, `F${index + 1}`, {
-      fontSize: '16px',
-      color: 'white',
-      align: 'center',
-    }).setOrigin(0.5);
-
-    return box;
   }
 
   function create() {
@@ -184,50 +166,50 @@ const PhaserGame = () => {
           const draggedRank = gameObject.getData('rank');
           const draggedSuit = gameObject.getData('suit');
 
-  // If foundation is empty, only allow Ace to be placed
-  if (!currentCard) {
-    if (draggedRank === 'A') {
-      console.log(`Card dropped into foundation ${index + 1} as Ace.`);
-      box.setData('card', gameObject); // Place the Ace in the foundation
-      gameObject.setPosition(bounds.centerX, bounds.centerY); // Snap to foundation
-    } else {
-      console.log(`Card cannot be placed in foundation ${index + 1}. Only Ace allowed.`);
-      gameObject.setPosition(gameObject.input.dragStartX, gameObject.input.dragStartY); // Return to original position
-    }
-  } else {
-    // Foundation already has a card, check if the rank is correct and suits match
-    const currentRank = currentCard.getData('rank');
-    const currentSuit = currentCard.getData('suit');
+          // If foundation is empty, only allow Ace to be placed
+          if (!currentCard) {
+            if (draggedRank === 'A') {
+              console.log(`Card dropped into foundation ${index + 1} as Ace.`);
+              box.setData('card', gameObject); // Place the Ace in the foundation
+              gameObject.setPosition(bounds.centerX, bounds.centerY); // Snap to foundation
+            } else {
+              console.log(`Card cannot be placed in foundation ${index + 1}. Only Ace allowed.`);
+              gameObject.setPosition(gameObject.input.dragStartX, gameObject.input.dragStartY); // Return to original position
+            }
+          } else {
+            // Foundation already has a card, check if the rank is correct and suits match
+            const currentRank = currentCard.getData('rank');
+            const currentSuit = currentCard.getData('suit');
 
-        // Order of ranks in ascending order for valid placement
-        const rankOrder = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-        const nextRankIndex = rankOrder.indexOf(currentRank) + 1;
-        const nextRank = rankOrder[nextRankIndex];
+            // Order of ranks in ascending order for valid placement
+            const rankOrder = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+            const nextRankIndex = rankOrder.indexOf(currentRank) + 1;
+            const nextRank = rankOrder[nextRankIndex];
 
-        // Validate if the next rank matches and the suit is correct
-        if (draggedRank === nextRank && draggedSuit === currentSuit) {
-          console.log(`Card dropped into foundation ${index + 1} in correct order.`);
-          box.setData('card', gameObject); // Place the card in the foundation
-          gameObject.setPosition(bounds.centerX, bounds.centerY); // Snap to foundation
-        } else {
-          console.log(`Card cannot be placed in foundation ${index + 1}. Incorrect rank or suit.`);
-          gameObject.setPosition(gameObject.input.dragStartX, gameObject.input.dragStartY); // Return to original position
+            // Validate if the next rank matches and the suit is correct
+            if (draggedRank === nextRank && draggedSuit === currentSuit) {
+              console.log(`Card dropped into foundation ${index + 1} in correct order.`);
+              box.setData('card', gameObject); // Place the card in the foundation
+              gameObject.setPosition(bounds.centerX, bounds.centerY); // Snap to foundation
+            } else {
+              console.log(`Card cannot be placed in foundation ${index + 1}. Incorrect rank or suit.`);
+              gameObject.setPosition(gameObject.input.dragStartX, gameObject.input.dragStartY); // Return to original position
+            }
+          }
         }
+      });
+
+      if (!droppedInFoundation) {
+        console.log('Card not dropped in a foundation');
+        gameObject.setPosition(gameObject.input.dragStartX, gameObject.input.dragStartY); // Return to original position
       }
-    }
-  });
 
-  if (!droppedInFoundation) {
-    console.log('Card not dropped in a foundation');
-    gameObject.setPosition(gameObject.input.dragStartX, gameObject.input.dragStartY); // Return to original position
-  }
-
-  // If the card came from the stockpile
-  if (stockpile.includes(gameObject)) {
-    stockpile.pop();
-    updateStockpileInteractivity.call(this);
-  }
-});
+      // If the card came from the stockpile
+      if (stockpile.includes(gameObject)) {
+        stockpile.pop();
+        updateStockpileInteractivity.call(this);
+      }
+    });
   }
 
   function update() {
