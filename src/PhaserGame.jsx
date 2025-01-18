@@ -198,16 +198,12 @@ const PhaserGame = () => {
         if (Phaser.Geom.Rectangle.Overlaps(bounds, gameObject.getBounds())) {
           droppedInFoundation = true;
 
-
-
           if (index === 4) {
             // SPECIAL RULE FOR FIFTH FOUNDATION BOX --------------------------------------------//
             console.log('Card dropped into the fifth foundation.');
             box.setData('card', gameObject); // Place the card in the foundation
             gameObject.setPosition(bounds.centerX, bounds.centerY); // Snap to foundation
           } else {
-
-
 
             const draggedRank = gameObject.getData('rank');
             const draggedSuit = gameObject.getData('suit');
