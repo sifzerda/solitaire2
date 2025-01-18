@@ -147,6 +147,30 @@ const PhaserGame = () => {
 
   // --------------------------------------------------------///
 
+ // Button to cycle stockpile cards
+ const cycleButton = this.add.text(500, 800, 'Next Card', {
+  fontSize: '18px',
+  color: 'black',
+  backgroundColor: 'white',
+  padding: { x: 10, y: 5 },
+  borderRadius: 5,
+  align: 'center',
+}).setOrigin(0.5).setInteractive();
+
+cycleButton.on('pointerdown', () => {
+  const topCard = stockpile.pop(); // Remove the top card
+  stockpile.unshift(topCard); // Add the removed card to the bottom
+
+  // Update the card's position
+  stockpile.forEach((card, index) => {
+    card.setPosition(stockpileX, stockpileY - index * 5);
+  });
+
+  updateStockpileInteractivity.call(this);
+});
+
+  // --------------------------------------------------------///
+
     // Drag events
     this.input.on('dragstart', (pointer, gameObject) => {
       gameObject.setScale(1.1);
