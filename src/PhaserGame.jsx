@@ -28,11 +28,11 @@ const PhaserGame = () => {
     };
   }, []);
 
+  const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+  const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
+
   // Preload card images
   function preload() {
-    const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-    const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
-
     ranks.forEach(rank => {
       suits.forEach(suit => {
         this.load.image(`${rank}_${suit}`, `/assets/cards/${rank}_${suit}.png`);
@@ -42,8 +42,6 @@ const PhaserGame = () => {
 
   // Card creation logic
   function createCard(scene, x, y, index) {
-    const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-    const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
     const rank = ranks[index % ranks.length]; // Assign rank based on index
     const suit = suits[Math.floor(index / ranks.length)]; // Assign suit based on index
 
