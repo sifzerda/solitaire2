@@ -83,6 +83,7 @@ const PhaserGame = () => {
     const deck = []; // Deck for tableaux
     const stockpile = []; // Stockpile
     const foundations = []; // Foundations for the game
+    const revealedCards = []; // Area to hold revealed cards
 
     const rows = 7;
     const cols = 7;
@@ -90,50 +91,56 @@ const PhaserGame = () => {
     const spacingY = 40;
     const startX = 80;
     const startY = 300;
-  
+
     // Stockpile spacing
     const stockpileX = 80;
     const stockpileY = 190;
 
-  // Create stockpile cards
-  for (let i = 0; i < 24; i++) {
-    const card = createCard(this, stockpileX, stockpileY - i * 5, i);
-    stockpile.push(card);
-  }
+    // Revealed card position
+    const revealedX = 180;
+    const revealedY = 190;
 
-  function updateStockpileInteractivity() {
-    // Disable interactivity for all cards in the stockpile
-    stockpile.forEach((card) => {
-      card.disableInteractive();
-    });
-  
-  // Set the top card as interactive
-  const topCard = stockpile[stockpile.length - 1];
-  if (topCard) {
-    topCard.setInteractive();
-    topCard.on('pointerdown', () => {
-      cycleStockpile();
-    });
-  }
-}
+    // Create stockpile cards
+    for (let i = 0; i < 24; i++) {
+      const card = createCard(this, stockpileX, stockpileY - i * 5, i);
+      stockpile.push(card);
+    }
 
-function cycleStockpile() {
-  // Remove the top card and add it to the bottom of the stockpile
-  if (stockpile.length > 0) {
-    const topCard = stockpile.pop(); // Remove the top card
-    stockpile.unshift(topCard); // Add it to the bottom of the stockpile
+    function updateStockpileInteractivity() {
+      // Disable interactivity for all cards in the stockpile
+      stockpile.forEach((card) => {
+        card.disableInteractive();
+      });
 
-    // Update the positions of all stockpile cards
-    stockpile.forEach((card, index) => {
-      card.setPosition(stockpileX, stockpileY - index * 5);
-    });
+      // Set the top card as interactive
+      const topCard = stockpile[stockpile.length - 1];
+      if (topCard) {
+        topCard.setInteractive();
+        topCard.on('pointerdown', () => {
+          cycleStockpile();
+        });
+      }
+    }
 
-    updateStockpileInteractivity.call(this); // Update interactivity for the new top card
-  }
-}
+    function cycleStockpile() {
+      if (stockpile.length > 0) {
+        const topCard = stockpile.pop(); // Remove the top card
+        topCard.setPosition(revealedX, revealedY); // Position it to the right
+        topCard.setInteractive(); // Make it draggable
+        this.input.setDraggable(topCard); // Enable dragging
+        revealedCards.push(topCard); // Add to revealed cards array
 
-// Replace `revealTopCard` calls with `cycleStockpile` where necessary
-updateStockpileInteractivity.call(this);
+        // Update the positions of all stockpile cards
+        stockpile.forEach((card, index) => {
+          card.setPosition(stockpileX, stockpileY - index * 5);
+        });
+
+        updateStockpileInteractivity.call(this); // Update interactivity for the new top card
+      }
+    }
+
+    // Replace `revealTopCard` calls with `cycleStockpile` where necessary
+    updateStockpileInteractivity.call(this);
 
     // Create tableaux layout
     for (let row = 0; row < rows; row++) {
@@ -159,13 +166,13 @@ updateStockpileInteractivity.call(this);
 
     /// SPECIAL DEBUG DROP ALL ZONE -------------------------////
 
-      // Create the fifth foundation box
-  const fifthFoundationX = foundationX + 400; // Adjust position as needed
-  const fifthFoundation = createFoundationBox(this, fifthFoundationX, foundationY, 4);
-  fifthFoundation.setData('bounds', new Phaser.Geom.Rectangle(fifthFoundationX, foundationY, 70, 100));
-  foundations.push(fifthFoundation);
+    // Create the fifth foundation box
+    const fifthFoundationX = foundationX + 400; // Adjust position as needed
+    const fifthFoundation = createFoundationBox(this, fifthFoundationX, foundationY, 4);
+    fifthFoundation.setData('bounds', new Phaser.Geom.Rectangle(fifthFoundationX, foundationY, 70, 100));
+    foundations.push(fifthFoundation);
 
-  // --------------------------------------------------------///
+    // --------------------------------------------------------///
 
     // Drag events
     this.input.on('dragstart', (pointer, gameObject) => {
@@ -202,42 +209,42 @@ updateStockpileInteractivity.call(this);
 
 
 
-          const draggedRank = gameObject.getData('rank');
-          const draggedSuit = gameObject.getData('suit');
+            const draggedRank = gameObject.getData('rank');
+            const draggedSuit = gameObject.getData('suit');
 
-          // If foundation is empty, only allow Ace to be placed
-          if (!currentCard) {
-            if (draggedRank === 'A') {
-              console.log(`Card dropped into foundation ${index + 1} as Ace.`);
-              box.setData('card', gameObject); // Place the Ace in the foundation
-              gameObject.setPosition(bounds.centerX, bounds.centerY); // Snap to foundation
+            // If foundation is empty, only allow Ace to be placed
+            if (!currentCard) {
+              if (draggedRank === 'A') {
+                console.log(`Card dropped into foundation ${index + 1} as Ace.`);
+                box.setData('card', gameObject); // Place the Ace in the foundation
+                gameObject.setPosition(bounds.centerX, bounds.centerY); // Snap to foundation
+              } else {
+                console.log(`Card cannot be placed in foundation ${index + 1}. Only Ace allowed.`);
+                gameObject.setPosition(gameObject.input.dragStartX, gameObject.input.dragStartY); // Return to original position
+              }
             } else {
-              console.log(`Card cannot be placed in foundation ${index + 1}. Only Ace allowed.`);
-              gameObject.setPosition(gameObject.input.dragStartX, gameObject.input.dragStartY); // Return to original position
-            }
-          } else {
-            // Foundation already has a card, check if the rank is correct and suits match
-            const currentRank = currentCard.getData('rank');
-            const currentSuit = currentCard.getData('suit');
+              // Foundation already has a card, check if the rank is correct and suits match
+              const currentRank = currentCard.getData('rank');
+              const currentSuit = currentCard.getData('suit');
 
-            // Order of ranks in ascending order for valid placement
-            const rankOrder = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-            const nextRankIndex = rankOrder.indexOf(currentRank) + 1;
-            const nextRank = rankOrder[nextRankIndex];
+              // Order of ranks in ascending order for valid placement
+              const rankOrder = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+              const nextRankIndex = rankOrder.indexOf(currentRank) + 1;
+              const nextRank = rankOrder[nextRankIndex];
 
-            // Validate if the next rank matches and the suit is correct
-            if (draggedRank === nextRank && draggedSuit === currentSuit) {
-              console.log(`Card dropped into foundation ${index + 1} in correct order.`);
-              box.setData('card', gameObject); // Place the card in the foundation
-              gameObject.setPosition(bounds.centerX, bounds.centerY); // Snap to foundation
-            } else {
-              console.log(`Card cannot be placed in foundation ${index + 1}. Incorrect rank or suit.`);
-              gameObject.setPosition(gameObject.input.dragStartX, gameObject.input.dragStartY); // Return to original position
+              // Validate if the next rank matches and the suit is correct
+              if (draggedRank === nextRank && draggedSuit === currentSuit) {
+                console.log(`Card dropped into foundation ${index + 1} in correct order.`);
+                box.setData('card', gameObject); // Place the card in the foundation
+                gameObject.setPosition(bounds.centerX, bounds.centerY); // Snap to foundation
+              } else {
+                console.log(`Card cannot be placed in foundation ${index + 1}. Incorrect rank or suit.`);
+                gameObject.setPosition(gameObject.input.dragStartX, gameObject.input.dragStartY); // Return to original position
+              }
             }
           }
         }
-      }
-    });
+      });
 
       if (!droppedInFoundation) {
         console.log('Card not dropped in a foundation');

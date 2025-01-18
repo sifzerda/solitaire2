@@ -126,6 +126,7 @@ const PhaserGame = () => {
   function revealTopCard() {
     if (stockpile.length > 0) {
       const topCard = stockpile.pop(); // Remove the top card from the stockpile
+      
       topCard.setPosition(revealedX, revealedY); // Position it to the right
       topCard.setInteractive(); // Make it draggable
       this.input.setDraggable(topCard); // Enable dragging
