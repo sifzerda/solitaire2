@@ -28,4 +28,4 @@
 
 
 
-The first solitaire I made took 2 weeks to build. This one took xx (currently 2) days.
+The first solitaire I made took 2 weeks to build. This one took xx (currently 3) days.

@@ -1,3 +1,6 @@
+
+// same as Test, but with the fifth foundation box added for debug purposes
+
 // PhaserGame.js
 import { useRef, useEffect } from 'react';
 import Phaser from 'phaser';
