@@ -90,30 +90,50 @@ const PhaserGame = () => {
     const spacingY = 40;
     const startX = 80;
     const startY = 300;
-
+  
     // Stockpile spacing
     const stockpileX = 80;
     const stockpileY = 190;
 
-    // Create stockpile cards
-    for (let i = 0; i < 24; i++) {
-      const card = createCard(this, stockpileX, stockpileY - i * 5, i);
-      stockpile.push(card);
-    }
+  // Create stockpile cards
+  for (let i = 0; i < 24; i++) {
+    const card = createCard(this, stockpileX, stockpileY - i * 5, i);
+    stockpile.push(card);
+  }
 
-    function updateStockpileInteractivity() {
-      stockpile.forEach((card) => {
-        card.disableInteractive();
-      });
+  function updateStockpileInteractivity() {
+    // Disable interactivity for all cards in the stockpile
+    stockpile.forEach((card) => {
+      card.disableInteractive();
+    });
+  
+  // Set the top card as interactive
+  const topCard = stockpile[stockpile.length - 1];
+  if (topCard) {
+    topCard.setInteractive();
+    topCard.on('pointerdown', () => {
+      cycleStockpile();
+    });
+  }
+}
 
-      const topCard = stockpile[stockpile.length - 1];
-      if (topCard) {
-        topCard.setInteractive();
-        this.input.setDraggable(topCard);
-      }
-    }
+function cycleStockpile() {
+  // Remove the top card and add it to the bottom of the stockpile
+  if (stockpile.length > 0) {
+    const topCard = stockpile.pop(); // Remove the top card
+    stockpile.unshift(topCard); // Add it to the bottom of the stockpile
 
-    updateStockpileInteractivity.call(this);
+    // Update the positions of all stockpile cards
+    stockpile.forEach((card, index) => {
+      card.setPosition(stockpileX, stockpileY - index * 5);
+    });
+
+    updateStockpileInteractivity.call(this); // Update interactivity for the new top card
+  }
+}
+
+// Replace `revealTopCard` calls with `cycleStockpile` where necessary
+updateStockpileInteractivity.call(this);
 
     // Create tableaux layout
     for (let row = 0; row < rows; row++) {
@@ -144,30 +164,6 @@ const PhaserGame = () => {
   const fifthFoundation = createFoundationBox(this, fifthFoundationX, foundationY, 4);
   fifthFoundation.setData('bounds', new Phaser.Geom.Rectangle(fifthFoundationX, foundationY, 70, 100));
   foundations.push(fifthFoundation);
-
-  // --------------------------------------------------------///
-
- // Button to cycle stockpile cards
- const cycleButton = this.add.text(500, 800, 'Next Card', {
-  fontSize: '18px',
-  color: 'black',
-  backgroundColor: 'white',
-  padding: { x: 10, y: 5 },
-  borderRadius: 5,
-  align: 'center',
-}).setOrigin(0.5).setInteractive();
-
-cycleButton.on('pointerdown', () => {
-  const topCard = stockpile.pop(); // Remove the top card
-  stockpile.unshift(topCard); // Add the removed card to the bottom
-
-  // Update the card's position
-  stockpile.forEach((card, index) => {
-    card.setPosition(stockpileX, stockpileY - index * 5);
-  });
-
-  updateStockpileInteractivity.call(this);
-});
 
   // --------------------------------------------------------///
 
