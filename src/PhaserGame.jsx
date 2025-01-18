@@ -117,17 +117,17 @@ const PhaserGame = () => {
       if (topCard) {
         topCard.setInteractive();
         topCard.on('pointerdown', () => {
-          cycleStockpile();
+          cycleStockpile(this); // Pass the scene context here
         });
       }
     }
 
-    function cycleStockpile() {
+    function cycleStockpile(scene) {
       if (stockpile.length > 0) {
         const topCard = stockpile.pop(); // Remove the top card
         topCard.setPosition(revealedX, revealedY); // Position it to the right
         topCard.setInteractive(); // Make it draggable
-        this.input.setDraggable(topCard); // Enable dragging
+        scene.input.setDraggable(topCard); // Enable dragging
         revealedCards.push(topCard); // Add to revealed cards array
 
         // Update the positions of all stockpile cards
@@ -135,7 +135,7 @@ const PhaserGame = () => {
           card.setPosition(stockpileX, stockpileY - index * 5);
         });
 
-        updateStockpileInteractivity.call(this); // Update interactivity for the new top card
+        updateStockpileInteractivity(scene); // Update interactivity for the new top card
       }
     }
 
