@@ -1,8 +1,7 @@
 // PhaserGame.js
 import { useRef, useEffect } from 'react';
 import Phaser from 'phaser';
-import { createFoundationBox } from './components/foundations'; // Import the foundation functions
-import { preload, createCard } from './components/CardUtils'; // Import functions from CardUtils.js
+import { createFoundationBox } from './foundations'; // Import the foundation functions
 
 const PhaserGame = () => {
   const gameRef = useRef(null);
@@ -15,35 +14,97 @@ const PhaserGame = () => {
       height: 1000,
       backgroundColor: '#38c940', // green background
       scene: {
-        preload() {
-          preload(this); // Pass `this` (scene context) to preload function
-        },
-        create() {
-          const deck = []; // Deck for tableaux
-          const stockpile = []; // Stockpile
-          const foundations = []; // Foundations for the game
-          const revealedCards = []; // Area to hold revealed cards
+        preload,
+        create,
+        update,
+      },
+    };
 
-          const rows = 7;
-          const cols = 7;
-          const spacingX = 70;
-          const spacingY = 40;
-          const startX = 80;
-          const startY = 300;
+    const game = new Phaser.Game(config);
+    gameRef.current = game;
 
-          // Stockpile spacing
-          const stockpileX = 80;
-          const stockpileY = 190;
+    return () => {
+      game.destroy(true);
+    };
+  }, []);
 
-          // Revealed card position
-          const revealedX = 180;
-          const revealedY = 190;
+  const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+  const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
 
-          // Create stockpile cards
-          for (let i = 0; i < 24; i++) {
-            const card = createCard(this, stockpileX, stockpileY - i * 5, i);
-            stockpile.push(card);
-          }
+  // Preload card images
+  function preload() {
+    ranks.forEach(rank => {
+      suits.forEach(suit => {
+        this.load.image(`${rank}_${suit}`, `/assets/cards/${rank}_${suit}.png`);
+      });
+    });
+  }
+
+  // Card creation logic
+  function createCard(scene, x, y, index) {
+    const rank = ranks[index % ranks.length]; // Assign rank based on index
+    const suit = suits[Math.floor(index / ranks.length)]; // Assign suit based on index
+
+    // Create a container to group card elements
+    const cardContainer = scene.add.container(x, y);
+
+    // Add the card background (rectangle)
+    const card = scene.add.graphics();
+    card.fillStyle(0xffffff, 1); // White fill
+    card.lineStyle(1, 0x000000, 1); // Black outline
+    card.fillRect(-30, -45, 60, 90); // Card size
+    card.strokeRect(-30, -45, 60, 90); // Outline
+    cardContainer.add(card); // Add the card background to the container
+
+    // Add image to the card
+    const cardImage = scene.add.image(0, 0, `${rank}_${suit}`).setOrigin(0.5);
+    cardContainer.add(cardImage); // Add the image to the container
+
+    // Add the rank and suit text to the card
+    const label = scene.add.text(0, -25, `${rank} of ${suit}`, {
+      fontSize: '14px',
+      color: 'black',
+      align: 'center',
+    }).setOrigin(0.5);
+    cardContainer.add(label); // Add the label to the container
+
+    // Set interactive on the container to make the entire card draggable
+    cardContainer.setInteractive(new Phaser.Geom.Rectangle(-30, -45, 60, 90), Phaser.Geom.Rectangle.Contains);
+
+    // Store card data
+    cardContainer.setData('rank', rank); // Store rank in card data
+    cardContainer.setData('suit', suit); // Store suit in card data
+    cardContainer.setData('index', index); // Store index for reference
+
+    return cardContainer; // Return the container instead of just the card
+  }
+
+  function create() {
+    const deck = []; // Deck for tableaux
+    const stockpile = []; // Stockpile
+    const foundations = []; // Foundations for the game
+    const revealedCards = []; // Area to hold revealed cards
+
+    const rows = 7;
+    const cols = 7;
+    const spacingX = 70;
+    const spacingY = 40;
+    const startX = 80;
+    const startY = 300;
+
+    // Stockpile spacing
+    const stockpileX = 80;
+    const stockpileY = 190;
+
+    // Revealed card position
+    const revealedX = 180;
+    const revealedY = 190;
+
+    // Create stockpile cards
+    for (let i = 0; i < 24; i++) {
+      const card = createCard(this, stockpileX, stockpileY - i * 5, i);
+      stockpile.push(card);
+    }
 
     function updateStockpileInteractivity() {
       // Disable interactivity for all cards in the stockpile
@@ -81,18 +142,18 @@ const PhaserGame = () => {
     // Replace `revealTopCard` calls with `cycleStockpile` where necessary
     updateStockpileInteractivity.call(this);
 
-          // Create tableaux layout
-          for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
-              if (col >= row) {
-                const x = startX + col * spacingX;
-                const y = startY + row * spacingY;
-                const card = createCard(this, x, y, row * cols + col);
-                this.input.setDraggable(card);
-                deck.push(card);
-              }
-            }
-          }
+    // Create tableaux layout
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        if (col >= row) {
+          const x = startX + col * spacingX;
+          const y = startY + row * spacingY;
+          const card = createCard(this, x, y, row * cols + col);
+          this.input.setDraggable(card);
+          deck.push(card);
+        }
+      }
+    }
 
     // Create foundation boxes with bounds
     const foundationX = 150;
@@ -137,12 +198,16 @@ const PhaserGame = () => {
         if (Phaser.Geom.Rectangle.Overlaps(bounds, gameObject.getBounds())) {
           droppedInFoundation = true;
 
+
+
           if (index === 4) {
             // SPECIAL RULE FOR FIFTH FOUNDATION BOX --------------------------------------------//
             console.log('Card dropped into the fifth foundation.');
             box.setData('card', gameObject); // Place the card in the foundation
             gameObject.setPosition(bounds.centerX, bounds.centerY); // Snap to foundation
           } else {
+
+
 
             const draggedRank = gameObject.getData('rank');
             const draggedSuit = gameObject.getData('suit');
@@ -192,25 +257,13 @@ const PhaserGame = () => {
         updateStockpileInteractivity.call(this);
       }
     });
-  },
+  }
 
-        update() {
-          // Game loop (not used here but can be expanded for interactions)
-        },
-      },
-    };
-
-    const game = new Phaser.Game(config);
-    gameRef.current = game;
-
-    return () => {
-      game.destroy(true);
-    }
-  }, []);
-
+  function update() {
+    // Game loop (not used here but can be expanded for interactions)
+  }
 
   return <div id="phaser-container" />;
 };
-
 
 export default PhaserGame;
