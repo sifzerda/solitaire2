@@ -1,4 +1,5 @@
 // foundations.js
+// creates and labels foundations boxes
 
 export function createFoundationBox(scene, x, y, index) {
     const box = scene.add.graphics({ x, y });
