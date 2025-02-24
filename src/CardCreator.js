@@ -24,12 +24,12 @@ export function createCard(scene, x, y, index) {
     cardContainer.add(cardImage);    
   
     // Add the rank and suit text to the card
-    const label = scene.add.text(0, -25, `${rank} of ${suit}`, {
-      fontSize: '14px',
-      color: 'black',
-      align: 'center',
-    }).setOrigin(0.5);
-    cardContainer.add(label); // Add the label to the container
+    //const label = scene.add.text(0, -25, `${rank} of ${suit}`, {
+    //  fontSize: '14px',
+    //  color: 'black',
+    //  align: 'center',
+  //  }).setOrigin(0.5);
+  //  cardContainer.add(label); // Add the label to the container
   
     // Set interactive on the container to make the entire card draggable
     cardContainer.setInteractive(new Phaser.Geom.Rectangle(-30, -45, 60, 90), Phaser.Geom.Rectangle.Contains);
