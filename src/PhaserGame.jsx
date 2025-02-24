@@ -3,6 +3,9 @@ import { useRef, useEffect } from 'react';
 import Phaser from 'phaser';
 import { createFoundationBox } from './foundations'; // Import the foundation functions
 
+
+
+
 const PhaserGame = () => {
   const gameRef = useRef(null);
 
@@ -28,6 +31,8 @@ const PhaserGame = () => {
     };
   }, []);
 
+// START OF CARD CREATION LOGIC
+
   const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
   const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
 
@@ -35,7 +40,7 @@ const PhaserGame = () => {
   function preload() {
     ranks.forEach(rank => {
       suits.forEach(suit => {
-        this.load.image(`${rank}_${suit}`, `/assets/cards/${rank}_${suit}.png`);
+        this.load.image(`${rank}_${suit}`, `src/assets/cards/${rank}_${suit}.png`);
       });
     });
   }
@@ -56,9 +61,10 @@ const PhaserGame = () => {
     card.strokeRect(-30, -45, 60, 90); // Outline
     cardContainer.add(card); // Add the card background to the container
 
-    // Add image to the card
+    // Add the card image
     const cardImage = scene.add.image(0, 0, `${rank}_${suit}`).setOrigin(0.5);
-    cardContainer.add(cardImage); // Add the image to the container
+    cardImage.setDisplaySize(60, 90); // Set a fixed width and height for the card
+    cardContainer.add(cardImage);    
 
     // Add the rank and suit text to the card
     const label = scene.add.text(0, -25, `${rank} of ${suit}`, {
@@ -78,6 +84,8 @@ const PhaserGame = () => {
 
     return cardContainer; // Return the container instead of just the card
   }
+
+  // END OF CARD CREATION LOGIC
 
   function create() {
     const deck = []; // Deck for tableaux
