@@ -2,9 +2,7 @@
 import { useRef, useEffect } from 'react';
 import Phaser from 'phaser';
 import { createFoundationBox } from './foundations'; // Import the foundation functions
-
-
-
+import { createCard } from './CardCreator'; // Import the card creation function
 
 const PhaserGame = () => {
   const gameRef = useRef(null);
@@ -31,8 +29,6 @@ const PhaserGame = () => {
     };
   }, []);
 
-// START OF CARD CREATION LOGIC
-
   const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
   const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
 
@@ -44,48 +40,6 @@ const PhaserGame = () => {
       });
     });
   }
-
-  // Card creation logic
-  function createCard(scene, x, y, index) {
-    const rank = ranks[index % ranks.length]; // Assign rank based on index
-    const suit = suits[Math.floor(index / ranks.length)]; // Assign suit based on index
-
-    // Create a container to group card elements
-    const cardContainer = scene.add.container(x, y);
-
-    // Add the card background (rectangle)
-    const card = scene.add.graphics();
-    card.fillStyle(0xffffff, 1); // White fill
-    card.lineStyle(1, 0x000000, 1); // Black outline
-    card.fillRect(-30, -45, 60, 90); // Card size
-    card.strokeRect(-30, -45, 60, 90); // Outline
-    cardContainer.add(card); // Add the card background to the container
-
-    // Add the card image
-    const cardImage = scene.add.image(0, 0, `${rank}_${suit}`).setOrigin(0.5);
-    cardImage.setDisplaySize(60, 90); // Set a fixed width and height for the card
-    cardContainer.add(cardImage);    
-
-    // Add the rank and suit text to the card
-    const label = scene.add.text(0, -25, `${rank} of ${suit}`, {
-      fontSize: '14px',
-      color: 'black',
-      align: 'center',
-    }).setOrigin(0.5);
-    cardContainer.add(label); // Add the label to the container
-
-    // Set interactive on the container to make the entire card draggable
-    cardContainer.setInteractive(new Phaser.Geom.Rectangle(-30, -45, 60, 90), Phaser.Geom.Rectangle.Contains);
-
-    // Store card data
-    cardContainer.setData('rank', rank); // Store rank in card data
-    cardContainer.setData('suit', suit); // Store suit in card data
-    cardContainer.setData('index', index); // Store index for reference
-
-    return cardContainer; // Return the container instead of just the card
-  }
-
-  // END OF CARD CREATION LOGIC
 
   function create() {
     const deck = []; // Deck for tableaux
