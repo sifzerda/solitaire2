@@ -46,40 +46,40 @@ const PhaserGame = () => {
     const stockpile = []; // Stockpile
     const foundations = []; // Foundations for the game
     const revealedCards = []; // Area to hold revealed cards
-
+  
     const rows = 7;
     const cols = 7;
     const spacingX = 70;
     const spacingY = 40;
     const startX = 80;
     const startY = 300;
-
+  
     // Stockpile spacing
     const stockpileX = 80;
     const stockpileY = 190;
-
+  
     // Revealed card position
     const revealedX = 180;
     const revealedY = 190;
-
+  
     // Create stockpile cards
     for (let i = 0; i < 24; i++) {
       const card = createCard(this, stockpileX, stockpileY - i * 5, i);
       stockpile.push(card);
     }
 
-    function updateStockpileInteractivity() {
+    function updateStockpileInteractivity(scene) {
       // Disable interactivity for all cards in the stockpile
       stockpile.forEach((card) => {
         card.disableInteractive();
       });
-
+  
       // Set the top card as interactive
       const topCard = stockpile[stockpile.length - 1];
       if (topCard) {
         topCard.setInteractive();
         topCard.on('pointerdown', () => {
-          cycleStockpile(this); // Pass the scene context here
+          cycleStockpile(scene); // Pass the Phaser scene context
         });
       }
     }
@@ -91,18 +91,18 @@ const PhaserGame = () => {
         topCard.setInteractive(); // Make it draggable
         scene.input.setDraggable(topCard); // Enable dragging
         revealedCards.push(topCard); // Add to revealed cards array
-
+  
         // Update the positions of all stockpile cards
         stockpile.forEach((card, index) => {
           card.setPosition(stockpileX, stockpileY - index * 5);
         });
-
+  
         updateStockpileInteractivity(scene); // Update interactivity for the new top card
       }
     }
-
+  
     // Replace `revealTopCard` calls with `cycleStockpile` where necessary
-    updateStockpileInteractivity.call(this);
+    updateStockpileInteractivity(this); // Correct context here
 
     // Create tableaux layout
     for (let row = 0; row < rows; row++) {
