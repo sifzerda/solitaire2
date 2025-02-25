@@ -11,7 +11,7 @@
 + [ ] add button to restart (re-initialize cards) game
 + [ ] track player moves (using phaser system)
 + [ ] make sub-level tableaux cards facedown
-+ [ ] click to cycle stockpile cards and loop
++ [x] click to cycle stockpile cards and loop
 
 ### Later:
 + [ ] add card images (later)
@@ -22,10 +22,3 @@
 ## Tech Used:
 + react-router
 + phaser
-
-
-
-
-
-
-The first solitaire I made took 2 weeks to build. This one took xx (currently 3) days.

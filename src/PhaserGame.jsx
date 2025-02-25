@@ -41,6 +41,8 @@ const PhaserGame = () => {
     });
   }
 
+  // ------------------------------ CREATE MAIN ELEMENTS ------------------------------//
+
   function create() {
     const deck = []; // Deck for tableaux
     const stockpile = []; // Stockpile
@@ -126,7 +128,7 @@ const PhaserGame = () => {
       foundations.push(box);
     }
 
-    /// SPECIAL DEBUG DROP ALL ZONE -------------------------////
+    /// SPECIAL DEBUG DROP ALL ZONE ---------------------------------------------------------////
 
     // Create the fifth foundation box
     const fifthFoundationX = foundationX + 400; // Adjust position as needed
@@ -134,9 +136,9 @@ const PhaserGame = () => {
     fifthFoundation.setData('bounds', new Phaser.Geom.Rectangle(fifthFoundationX, foundationY, 70, 100));
     foundations.push(fifthFoundation);
 
-    // --------------------------------------------------------///
+    // ------------------------------------ DRAG EVENTS ------------------------------------///
 
-    // Drag events
+    // 
     this.input.on('dragstart', (pointer, gameObject) => {
       gameObject.setScale(1.1);
       gameObject.setDepth(1);
