@@ -63,12 +63,23 @@ const PhaserGame = () => {
     // Revealed card position
     const revealedX = 180;
     const revealedY = 190;
+
+    // Load the card back image
+    this.load.image('card_back', 'src/assets/cards/red_joker.png'); // Assuming the card back image is 'red_joker.png'
   
     // Create stockpile cards
     for (let i = 0; i < 24; i++) {
       const card = createCard(this, stockpileX, stockpileY - i * 5, i);
       stockpile.push(card);
     }
+
+// Make all stockpile cards face down except the revealed card
+if (i < stockpile.length - 1) { 
+  const cardBack = this.add.image(0, 0, 'card_back').setOrigin(0.5);
+  cardBack.setDisplaySize(60, 90);
+  card.add(cardBack);
+  cardBack.setAlpha(0);  // Ensure the card back is hidden
+}
 
     // STOCKPILE CYCLE AND DND ---------------------------------------------------------//
 
@@ -77,21 +88,24 @@ const PhaserGame = () => {
       stockpile.forEach((card, index) => {
         card.disableInteractive();
       });
-  
-  // Set the top card as interactive
-  const topCard = stockpile[stockpile.length - 1];
-  if (topCard) {
-    topCard.setInteractive();
-    topCard.on('pointerdown', () => {
-      cycleStockpile(scene); // Pass the Phaser scene context to cycle the stockpile
-    });
-  }
-}
+    
+      // Set the top card as interactive if it exists
+      const topCard = stockpile[stockpile.length - 1];
+      if (topCard) {
+        topCard.setInteractive();
+        topCard.on('pointerdown', () => {
+          cycleStockpile(scene); // Pass the Phaser scene context to cycle the stockpile
+        });
+      }
+    }
 
 // Function to cycle stockpile cards
 function cycleStockpile(scene) {
   if (stockpile.length > 0) {
     const topCard = stockpile.pop(); // Remove the top card
+
+    // Remove the back image from the top card
+    topCard.removeAll(true); // Remove all children (including the card back)
 
     // Move the top card to the revealed area
     topCard.setPosition(revealedX, revealedY); // Position it to the right
