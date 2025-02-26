@@ -200,11 +200,9 @@ function cycleStockpile(scene) {
 
               // Validate if the next rank matches and the suit is correct
               if (draggedRank === nextRank && draggedSuit === currentSuit) {
-                console.log(`Card dropped into foundation ${index + 1} in correct order.`);
                 box.setData('card', gameObject); // Place the card in the foundation
                 gameObject.setPosition(bounds.centerX, bounds.centerY); // Snap to foundation
               } else {
-                console.log(`Card cannot be placed in foundation ${index + 1}. Incorrect rank or suit.`);
                 gameObject.setPosition(gameObject.input.dragStartX, gameObject.input.dragStartY); // Return to original position
               }
             }
@@ -213,7 +211,6 @@ function cycleStockpile(scene) {
       });
 
       if (!droppedInFoundation) {
-        console.log('Card not dropped in a foundation');
         gameObject.setPosition(gameObject.input.dragStartX, gameObject.input.dragStartY); // Return to original position
       }
 
