@@ -70,42 +70,52 @@ const PhaserGame = () => {
       stockpile.push(card);
     }
 
+    // STOCKPILE CYCLE AND DND ---------------------------------------------------------//
+
     function updateStockpileInteractivity(scene) {
       // Disable interactivity for all cards in the stockpile
-      stockpile.forEach((card) => {
+      stockpile.forEach((card, index) => {
         card.disableInteractive();
       });
   
-      // Set the top card as interactive
-      const topCard = stockpile[stockpile.length - 1];
-      if (topCard) {
-        topCard.setInteractive();
-        topCard.on('pointerdown', () => {
-          cycleStockpile(scene); // Pass the Phaser scene context
-        });
-      }
-    }
+  // Set the top card as interactive
+  const topCard = stockpile[stockpile.length - 1];
+  if (topCard) {
+    topCard.setInteractive();
+    topCard.on('pointerdown', () => {
+      cycleStockpile(scene); // Pass the Phaser scene context to cycle the stockpile
+    });
+  }
+}
 
-    function cycleStockpile(scene) {
-      if (stockpile.length > 0) {
-        const topCard = stockpile.pop(); // Remove the top card
-        topCard.setPosition(revealedX, revealedY); // Position it to the right
-        topCard.setInteractive(); // Make it draggable
-        scene.input.setDraggable(topCard); // Enable dragging
-        revealedCards.push(topCard); // Add to revealed cards array
-  
-        // Update the positions of all stockpile cards
-        stockpile.forEach((card, index) => {
-          card.setPosition(stockpileX, stockpileY - index * 5);
-        });
-  
-        updateStockpileInteractivity(scene); // Update interactivity for the new top card
-      }
-    }
+// Function to cycle stockpile cards
+function cycleStockpile(scene) {
+  if (stockpile.length > 0) {
+    const topCard = stockpile.pop(); // Remove the top card
+
+    // Move the top card to the revealed area
+    topCard.setPosition(revealedX, revealedY); // Position it to the right
+    topCard.setInteractive(); // Make it draggable
+    scene.input.setDraggable(topCard); // Enable dragging
+    revealedCards.push(topCard); // Add to revealed cards array
+
+    // Disable interactivity for the revealed card (so it doesn't trigger cycling)
+    topCard.off('pointerdown');
+
+    // Update the positions of all remaining stockpile cards
+    stockpile.forEach((card, index) => {
+      card.setPosition(stockpileX, stockpileY - index * 5);
+    });
+
+    updateStockpileInteractivity(scene); // Update interactivity for the new top card
+  }
+}
   
     // Replace `revealTopCard` calls with `cycleStockpile` where necessary
     updateStockpileInteractivity(this); // Correct context here
 
+// ---------------------------------------------------------------------------------//
+    
     // Create tableaux layout
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
@@ -164,22 +174,18 @@ const PhaserGame = () => {
 
           if (index === 4) {
             // SPECIAL RULE FOR FIFTH FOUNDATION BOX --------------------------------------------//
-            console.log('Card dropped into the fifth foundation.');
             box.setData('card', gameObject); // Place the card in the foundation
             gameObject.setPosition(bounds.centerX, bounds.centerY); // Snap to foundation
           } else {
-
             const draggedRank = gameObject.getData('rank');
             const draggedSuit = gameObject.getData('suit');
 
             // If foundation is empty, only allow Ace to be placed
             if (!currentCard) {
               if (draggedRank === 'A') {
-                console.log(`Card dropped into foundation ${index + 1} as Ace.`);
                 box.setData('card', gameObject); // Place the Ace in the foundation
                 gameObject.setPosition(bounds.centerX, bounds.centerY); // Snap to foundation
               } else {
-                console.log(`Card cannot be placed in foundation ${index + 1}. Only Ace allowed.`);
                 gameObject.setPosition(gameObject.input.dragStartX, gameObject.input.dragStartY); // Return to original position
               }
             } else {
