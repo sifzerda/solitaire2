@@ -12,6 +12,7 @@
 + [ ] track player moves (using phaser system)
 + [ ] make sub-level tableaux cards facedown
 + [x] click to cycle stockpile cards and loop
++ [ ] re-position revealed stockpile card and/or foundation cards to remove overlap
 
 ### Later:
 + [ ] add card images (later)
