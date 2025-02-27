@@ -219,6 +219,13 @@ function cycleStockpile(scene) {
         stockpile.pop();
         updateStockpileInteractivity.call(this);
       }
+
+      foundations.forEach((box) => {
+        if (box.getData('card') === gameObject) {
+          box.setData('card', null); // Clear the card from the foundation
+        }
+      });
+
     });
   }
 
