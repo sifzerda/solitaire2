@@ -14,6 +14,10 @@
 + [x] click to cycle stockpile cards and loop
 + [ ] re-position revealed stockpile card and/or foundation cards to remove overlap
 + [ ] issue where if card dropped to foundation, then switched with other spot, prevents cards from dropping into prev. foundation box
++ [ ] add some phaser 'tweens' animations to smooth
++ [ ] when stockpile is all cycled, display btn which resets stockpile (minus cards placed on foundation or tableaux)
++ [ ] clicking the stockpile repeatedly puts revealed card back in stockpile, switching revealed card
++ [ ] add a UI (user interface) showing number of moves, timer, score, etc
 
 ### Later:
 + [ ] add card images (later)

@@ -1,6 +1,4 @@
-// CardCreator.js
-
-export function createCard(scene, x, y, index) {
+export function createCard(scene, x, y, index, cardWidth = 60, cardHeight = 90, outlineColor = 0x000000, isFaceUp = false) {
   const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
   const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
 
@@ -10,40 +8,57 @@ export function createCard(scene, x, y, index) {
   // Create a container to group card elements
   const cardContainer = scene.add.container(x, y);
 
-  // Add the card background (rectangle)
+  // Add card background (rectangle)
   const card = scene.add.graphics();
   card.fillStyle(0xffffff, 1); // White fill
-  card.lineStyle(1, 0x000000, 1); // Black outline
-  card.fillRect(-30, -45, 60, 90); // Card size
-  card.strokeRect(-30, -45, 60, 90); // Outline
-  cardContainer.add(card); // Add the card background to the container
+  card.lineStyle(1, outlineColor, 1); // Use outlineColor (default black if not passed)
+  card.fillRect(-cardWidth / 2, -cardHeight / 2, cardWidth, cardHeight); // Rectangle for the card background
+  card.strokeRect(-cardWidth / 2, -cardHeight / 2, cardWidth, cardHeight); // Card border
+  cardContainer.add(card);
 
-  // Add the card image
+  // Add the card image (face-up)
   const cardImage = scene.add.image(0, 0, `${rank}_${suit}`).setOrigin(0.5);
-  cardImage.setDisplaySize(60, 90); // Set a fixed width and height for the card
-  cardContainer.add(cardImage);    
+  cardImage.setDisplaySize(cardWidth, cardHeight); // Set the size of the card image
+  cardContainer.add(cardImage);
 
-  // Optionally add the card back (for face-down cards)
-  const cardBack = scene.add.image(0, 0, 'card_back').setOrigin(0.5).setAlpha(0); // Initially hidden
-  cardBack.setDisplaySize(60, 90); // Same size as the card front
-  cardContainer.add(cardBack); 
+  // Add card back (hidden initially)
+  const cardBack = scene.add.image(0, 0, 'card_back').setOrigin(0.5).setAlpha(1); // Face-down by default
+  cardBack.setDisplaySize(cardWidth, cardHeight); // Same size as the front of the card
+  cardContainer.add(cardBack);
 
-  // Set interactive on the container to make the entire card draggable
-  cardContainer.setInteractive(new Phaser.Geom.Rectangle(-30, -45, 60, 90), Phaser.Geom.Rectangle.Contains);
+  // Set the card as face-up or face-down based on the parameter
+  if (isFaceUp) {
+    cardImage.setAlpha(1); // Show the front of the card
+    cardBack.setAlpha(0);  // Hide the back of the card
+  } else {
+    cardImage.setAlpha(0);  // Hide the front of the card
+    cardBack.setAlpha(1);   // Show the back of the card
+  }
 
-  // Store card data (rank, suit, and index for reference)
-  cardContainer.setData('rank', rank); 
+  // Make the container interactive (draggable)
+  cardContainer.setInteractive(new Phaser.Geom.Rectangle(-cardWidth / 2, -cardHeight / 2, cardWidth, cardHeight), Phaser.Geom.Rectangle.Contains);
+
+  // Store card data (rank, suit, index, and whether it is face-up)
+  cardContainer.setData('rank', rank);
   cardContainer.setData('suit', suit);
   cardContainer.setData('index', index);
-  cardContainer.setData('cardBack', cardBack); // Store reference to card back for flipping
+  cardContainer.setData('cardBack', cardBack);
+  cardContainer.setData('isFaceUp', isFaceUp); // Track the face-up/down state
 
-  // Optional: Method to flip the card (face-up / face-down)
+  // Flip the card (animation)
   cardContainer.flipCard = function() {
-      const isFaceUp = cardImage.alpha === 1;
-      cardImage.setAlpha(isFaceUp ? 0 : 1); // Toggle visibility
-      cardBack.setAlpha(isFaceUp ? 1 : 0); // Toggle visibility
+    const isFaceUp = cardImage.alpha === 1;
+    if (isFaceUp) {
+      // Flip to face-down
+      cardImage.setAlpha(0);
+      cardBack.setAlpha(1);
+    } else {
+      // Flip to face-up
+      cardImage.setAlpha(1);
+      cardBack.setAlpha(0);
+    }
+    cardContainer.setData('isFaceUp', !isFaceUp); // Toggle the state
   };
 
   return cardContainer; // Return the container instead of just the card
 }
-  
