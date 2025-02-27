@@ -13,6 +13,7 @@
 + [ ] make sub-level tableaux cards facedown
 + [x] click to cycle stockpile cards and loop
 + [ ] re-position revealed stockpile card and/or foundation cards to remove overlap
++ [ ] issue where if card dropped to foundation, then switched with other spot, prevents cards from dropping into prev. foundation box
 
 ### Later:
 + [ ] add card images (later)
