@@ -118,16 +118,47 @@ function cycleStockpile(scene) {
 // ---------------------------------------------------------------------------------//
     
 // Create tableaux layout (cards will be face-down initially)
+const lastCardsInColumn = []; // Array to track the last face-up card in each column
+
 for (let row = 0; row < rows; row++) {
   for (let col = 0; col < cols; col++) {
     if (col >= row) {
       const x = startX + col * spacingX;
       const y = startY + row * spacingY;
-      const card = createCard(this, x, y, row * cols + col, 60, 90, 0x000000, false); // False makes it face-down
+
+      // Check if this is the last card in the column (i.e., last row for the current column)
+      const isFaceUp = (row === col); // Last card in the column should be face-up, others face-down
+
+      const card = createCard(this, x, y, row * cols + col, 60, 90, 0x000000, isFaceUp);
       this.input.setDraggable(card);
       deck.push(card);
+      // Track the last face-up card in each column
+      if (isFaceUp) {
+        lastCardsInColumn[col] = card; // Set this card as the last card for this column
+      }
     }
   }
+}
+
+// Function to update the face-up status of the last card in each column
+function updateLastCardInColumn(col) {
+  const columnCards = deck.filter(card => card.x === startX + col * spacingX); // Get all cards in the column
+
+  // Find the last card in the column
+  const lastCard = columnCards[columnCards.length - 1];
+
+  // Update face-up status
+  columnCards.forEach(card => {
+    if (card === lastCard) {
+      card.flipCard(); // Set the last card to face-up
+    } else {
+      card.setData('isFaceUp', false); // Set other cards face-down
+      card.flipCard(); // Flip back to face-down
+    }
+  });
+
+  // Update the tracked last card
+  lastCardsInColumn[col] = lastCard; // Update the last card in this column
 }
 
     // Create foundation boxes with bounds
@@ -149,7 +180,17 @@ for (let row = 0; row < rows; row++) {
 
     // ------------------------------------ DRAG EVENTS ------------------------------------///
 
-    // 
+  // Call this whenever a card is moved (e.g., after dragging or during gameplay)
+  // for switching face-up and face-down card status
+  this.input.on('dragend', (pointer, gameObject) => {
+    if (gameObject && gameObject.input && gameObject.input.dragStartX) {
+      const columnIndex = Math.floor((gameObject.x - startX) / spacingX);
+      updateLastCardInColumn(columnIndex); // Update last card after drag ends
+    }
+  });
+
+  // -----------------------------//
+
     this.input.on('dragstart', (pointer, gameObject) => {
       gameObject.setScale(1.1);
       gameObject.setDepth(1);
