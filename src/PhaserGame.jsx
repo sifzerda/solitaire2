@@ -89,16 +89,18 @@ const PhaserGame = () => {
   }
 }
 
-// Function to cycle stockpile cards
 function cycleStockpile(scene) {
   if (stockpile.length > 0) {
-    const topCard = stockpile.pop(); // Remove the top card
+    const topCard = stockpile.pop(); // Remove the top card from stockpile
 
     // Move the top card to the revealed area
     topCard.setPosition(revealedX, revealedY); // Position it to the right
     topCard.setInteractive(); // Make it draggable
     scene.input.setDraggable(topCard); // Enable dragging
     revealedCards.push(topCard); // Add to revealed cards array
+
+    // Flip the card face-up
+    topCard.flipCard(); // Use the flipCard method to make it face-up
 
     // Disable interactivity for the revealed card (so it doesn't trigger cycling)
     topCard.off('pointerdown');
