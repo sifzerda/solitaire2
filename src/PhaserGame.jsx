@@ -111,7 +111,6 @@ for (let col = 0; col < 7; col++) {
     if (isFaceUp) {
       this.input.setDraggable(card);
     }
-
     deck.push(card);
     if (isFaceUp) {
       lastCardsInColumn[col] = card;
@@ -119,11 +118,6 @@ for (let col = 0; col < 7; col++) {
     deckIndex++;
   }
 }
-
-
-
-
-
 
     // Create foundation boxes
     const foundationX = 150;
