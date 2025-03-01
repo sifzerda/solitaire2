@@ -1,3 +1,5 @@
+// has dragging from stockpile and tableaux, and dropping on foundations and tableaux.
+
 import { useRef, useEffect } from 'react';
 import Phaser from 'phaser';
 import { createFoundationBox } from './foundations'; // Import foundation functions

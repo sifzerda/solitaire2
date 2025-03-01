@@ -1,3 +1,5 @@
+// + has dnd from stockpile to foundations, but no tableaux dnd
+
 // PhaserGame.js
 import { useRef, useEffect } from 'react';
 import Phaser from 'phaser';
