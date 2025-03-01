@@ -96,24 +96,34 @@ const PhaserGame = () => {
 
     updateStockpileInteractivity(this);
 
-    // Deal cards to tableau (7 columns)
-    const lastCardsInColumn = [];
-    const allCards = [...deck, ...stockpile]; // Combine deck and stockpile for easy access
-    let deckIndex = 0;
-    for (let col = 0; col < 7; col++) {
-      for (let row = 0; row <= col; row++) {
-        const x = startX + col * spacingX;
-        const y = startY + row * spacingY;
-        const isFaceUp = (row === col); // Only the last card in the column is face-up
-        const card = createCard(this, x, y, deckIndex, 60, 90, 0x000000, isFaceUp);
-        this.input.setDraggable(card);
-        deck.push(card);
-        if (isFaceUp) {
-          lastCardsInColumn[col] = card;
-        }
-        deckIndex++;
-      }
+// Deal cards to tableau (7 columns)
+const lastCardsInColumn = [];
+const allCards = [...deck, ...stockpile]; // Combine deck and stockpile for easy access
+let deckIndex = 0;
+for (let col = 0; col < 7; col++) {
+  for (let row = 0; row <= col; row++) {
+    const x = startX + col * spacingX;
+    const y = startY + row * spacingY;
+    const isFaceUp = (row === col); // Only the last card in the column is face-up
+    const card = createCard(this, x, y, deckIndex, 60, 90, 0x000000, isFaceUp);
+
+    // If the card is face-up, make it draggable
+    if (isFaceUp) {
+      this.input.setDraggable(card);
     }
+
+    deck.push(card);
+    if (isFaceUp) {
+      lastCardsInColumn[col] = card;
+    }
+    deckIndex++;
+  }
+}
+
+
+
+
+
 
     // Create foundation boxes
     const foundationX = 150;
