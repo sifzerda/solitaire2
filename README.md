@@ -19,6 +19,8 @@
 + [ ] clicking the stockpile repeatedly puts revealed card back in stockpile, switching revealed card
 + [ ] add a UI (user interface) showing number of moves, timer, score, etc
 
++ [ ] Make facedown cards non-draggable (and faceup cards draggable), but if a card is topCard and facedown, you can click it and change it to faceup and draggable
+
 ### Later:
 + [ ] add card images (later)
 + [ ] create start screen
