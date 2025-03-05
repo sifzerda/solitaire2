@@ -30,3 +30,9 @@
 ## Tech Used:
 + react-router
 + phaser
+
+
+
+
+
+Game State Management: It might be helpful to abstract game state management, especially for managing the state of the tableau, stockpile, and foundations, to make future modifications easier.

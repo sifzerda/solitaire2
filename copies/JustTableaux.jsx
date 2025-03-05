@@ -1,6 +1,5 @@
 import { useRef, useEffect } from 'react';
 import Phaser from 'phaser';
-import { createFoundationBox } from './foundations'; // Import foundation functions
 import { createCard } from './CardCreator'; // Import the card creation function
 
 const PhaserGame = () => {
@@ -59,43 +58,6 @@ const PhaserGame = () => {
     const revealedX = 180;
     const revealedY = 190;
 
-    // Stockpile initialization
-    for (let i = 0; i < 24; i++) {
-      const card = createCard(this, stockpileX, stockpileY - i * 5, i);
-      stockpile.push(card);
-      card.setData('source', 'stockpile'); // Mark the source as stockpile
-    }
-
-    function updateStockpileInteractivity(scene) {
-      stockpile.forEach(card => card.disableInteractive());
-
-      const topCard = stockpile[stockpile.length - 1];
-      if (topCard) {
-        topCard.setInteractive();
-        topCard.on('pointerdown', () => {
-          cycleStockpile(scene); // Pass scene to cycle stockpile
-        });
-      }
-    }
-
-    function cycleStockpile(scene) {
-      if (stockpile.length > 0) {
-        const topCard = stockpile.pop();
-        topCard.setPosition(revealedX, revealedY);
-        topCard.setInteractive();
-        scene.input.setDraggable(topCard);
-        revealedCards.push(topCard);
-        topCard.flipCard();
-        topCard.off('pointerdown');
-        stockpile.forEach((card, index) => {
-          card.setPosition(stockpileX, stockpileY - index * 5);
-        });
-        updateStockpileInteractivity(scene);
-      }
-    }
-
-    updateStockpileInteractivity(this);
-
 // Deal cards to tableau (7 columns)
 const lastCardsInColumn = [];
 const allCards = [...deck, ...stockpile]; // Combine deck and stockpile for easy access
@@ -129,20 +91,6 @@ for (let col = 0; col < 7; col++) {
     }
   });
 
-    // Create foundation boxes
-    const foundationX = 150;
-    const foundationY = 90;
-    for (let i = 0; i < 4; i++) {
-      const box = createFoundationBox(this, foundationX + i * 100, foundationY, i);
-      box.setData('bounds', new Phaser.Geom.Rectangle(foundationX + i * 100, foundationY, 70, 100));
-      foundations.push(box);
-    }
-
-    // Special fifth foundation
-    const fifthFoundationX = foundationX + 400;
-    const fifthFoundation = createFoundationBox(this, fifthFoundationX, foundationY, 4);
-    fifthFoundation.setData('bounds', new Phaser.Geom.Rectangle(fifthFoundationX, foundationY, 70, 100));
-    foundations.push(fifthFoundation);
 
     // Drag-and-drop events
     this.input.on('dragstart', (pointer, gameObject) => {
@@ -158,49 +106,7 @@ for (let col = 0; col < 7; col++) {
       gameObject.setScale(1);
       gameObject.setDepth(0);
 
-      let droppedInFoundation = false;
-      foundations.forEach((box, index) => {
-        const bounds = box.getData('bounds');
-        const currentCard = box.getData('card');
-
-        if (Phaser.Geom.Rectangle.Overlaps(bounds, gameObject.getBounds())) {
-          droppedInFoundation = true;
-
-          if (index === 4) {
-            box.setData('card', gameObject);
-            gameObject.setPosition(bounds.centerX, bounds.centerY);
-          } else {
-            const draggedRank = gameObject.getData('rank');
-            const draggedSuit = gameObject.getData('suit');
-
-            if (!currentCard) {
-              if (draggedRank === 'A') {
-                box.setData('card', gameObject);
-                gameObject.setPosition(bounds.centerX, bounds.centerY);
-              } else {
-                gameObject.setPosition(gameObject.input.dragStartX, gameObject.input.dragStartY);
-              }
-            } else {
-              const currentRank = currentCard.getData('rank');
-              const currentSuit = currentCard.getData('suit');
-
-              const rankOrder = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-              const nextRankIndex = rankOrder.indexOf(currentRank) + 1;
-              const nextRank = rankOrder[nextRankIndex];
-
-              if (draggedRank === nextRank && draggedSuit === currentSuit) {
-                box.setData('card', gameObject);
-                gameObject.setPosition(bounds.centerX, bounds.centerY);
-              } else {
-                gameObject.setPosition(gameObject.input.dragStartX, gameObject.input.dragStartY);
-              }
-            }
-          }
-        }
-      });
-
       // If card is not dropped on foundation, check for tableau
-      if (!droppedInFoundation) {
         let droppedInTableau = false;
         for (let col = 0; col < 7; col++) {
           const columnCards = deck.filter(card => card.x === startX + col * spacingX);
@@ -244,7 +150,7 @@ for (let col = 0; col < 7; col++) {
         if (!droppedInTableau) {
           gameObject.setPosition(gameObject.input.dragStartX, gameObject.input.dragStartY);
         }
-      }
+      
 
        // Log the state of the last cards in the tableau columns after the update
   console.log("After Update - Last Cards in Columns:");
@@ -256,12 +162,6 @@ for (let col = 0; col < 7; col++) {
     }
   });
 
-
-      // Recycle stockpile if a card is dragged from there
-      if (gameObject.getData('source') === 'stockpile') {
-        stockpile.pop();
-        updateStockpileInteractivity.call(this);
-      }
     });
   }
 
