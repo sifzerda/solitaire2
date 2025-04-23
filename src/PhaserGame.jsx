@@ -166,6 +166,36 @@ for (let col = 0; col < 7; col++) {
         if (Phaser.Geom.Rectangle.Overlaps(bounds, gameObject.getBounds())) {
           droppedInFoundation = true;
 
+ // /////////////////////////////////////
+
+// Remove card from tableau column
+const prevColumn = gameObject.getData('column');
+if (prevColumn !== undefined) {
+  const columnCards = deck.filter(card => card.getData('column') === prevColumn);
+  const cardIndex = columnCards.indexOf(gameObject);
+  if (cardIndex > -1) {
+    deck.splice(deck.indexOf(gameObject), 1);
+    const newTopCard = columnCards[cardIndex - 1];
+    lastCardsInColumn[prevColumn] = newTopCard || null;
+  }
+  gameObject.setData('column', null); // Not in tableau anymore
+}
+
+// Remove from revealed pile
+const revealedIndex = revealedCards.indexOf(gameObject);
+if (revealedIndex > -1) {
+  revealedCards.splice(revealedIndex, 1);
+}
+
+// Remove from stockpile
+if (gameObject.getData('source') === 'stockpile') {
+  const stockIndex = stockpile.indexOf(gameObject);
+  if (stockIndex > -1) {
+    stockpile.splice(stockIndex, 1);
+  }
+}
+          //////////////////////////////////
+
           if (index === 4) {
             box.setData('card', gameObject);
             gameObject.setPosition(bounds.centerX, bounds.centerY);
