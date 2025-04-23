@@ -113,6 +113,8 @@ const PhaserGame = () => {
         // Assign increasing depth to each card
         card.setDepth(depthCounter++);
 
+        card.setData('column', col); // Store the column index
+
         // If the card is face-up, make it draggable
         if (isFaceUp) {
           this.input.setDraggable(card);
@@ -167,6 +169,7 @@ const PhaserGame = () => {
 
       let droppedInFoundation = false;
       foundations.forEach((box, index) => {
+
         const bounds = box.getData('bounds');
         const currentCard = box.getData('card');
 
@@ -272,7 +275,7 @@ const PhaserGame = () => {
               // Update destination column's last card (new top card)
               lastCardsInColumn[col] = gameObject;
               gameObject.setData('column', col);  // Update the column data for the dragged card
-
+              lastCardsInColumn[col] = gameObject; // Update the last card in the destination column
               break;
             }
           }

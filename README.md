@@ -10,7 +10,7 @@
 + [ ] shuffle cards every page refresh
 + [ ] add button to restart (re-initialize cards) game
 + [ ] track player moves (using phaser system)
-+ [ ] make sub-level tableaux cards facedown
++ [x] make sub-level tableaux cards facedown
 + [x] click to cycle stockpile cards and loop
 + [ ] re-position revealed stockpile card and/or foundation cards to remove overlap
 + [ ] issue where if card dropped to foundation, then switched with other spot, prevents cards from dropping into prev. foundation box
@@ -19,7 +19,8 @@
 + [ ] clicking the stockpile repeatedly puts revealed card back in stockpile, switching revealed card
 + [ ] add a UI (user interface) showing number of moves, timer, score, etc
 
-+ [ ] Make facedown cards non-draggable (and faceup cards draggable), but if a card is topCard and facedown, you can click it and change it to faceup and draggable
++ [x] Make facedown cards non-draggable (and faceup cards draggable), but if a card is topCard and facedown...
++ [ ] ...you can click it and change it to faceup and draggable
 
 ### Later:
 + [ ] add card images (later)
