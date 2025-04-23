@@ -41,7 +41,7 @@ const PhaserGame = () => {
   }
 
   function create() {
-    const deck = []; // Deck for tableau
+    const tableau = []; // Deck for tableau
     const stockpile = []; // Stockpile
     const foundations = []; // Foundations for the game
     const revealedCards = []; // Area to hold revealed cards
@@ -101,14 +101,14 @@ const PhaserGame = () => {
 
     // Deal cards to tableau (7 columns)
     const lastCardsInColumn = [];
-    const allCards = [...deck, ...stockpile]; // Combine deck and stockpile for easy access
-    let deckIndex = 0;
+    const allCards = [...tableau, ...stockpile]; // Combine deck and stockpile for easy access
+    let tableauIndex = 0;
     for (let col = 0; col < 7; col++) {
       for (let row = 0; row <= col; row++) {
         const x = startX + col * spacingX;
         const y = startY + row * spacingY;
         const isFaceUp = (row === col); // Only the last card in the column is face-up
-        const card = createCard(this, x, y, deckIndex, 60, 90, 0x000000, isFaceUp);
+        const card = createCard(this, x, y, tableauIndex, 60, 90, 0x000000, isFaceUp);
 
         // Assign increasing depth to each card
         card.setDepth(depthCounter++);
@@ -117,11 +117,11 @@ const PhaserGame = () => {
         if (isFaceUp) {
           this.input.setDraggable(card);
         }
-        deck.push(card);
+        tableau.push(card);
         if (isFaceUp) {
           lastCardsInColumn[col] = card;
         }
-        deckIndex++;
+        tableauIndex++;
       }
     }
 
@@ -164,6 +164,7 @@ const PhaserGame = () => {
       gameObject.setScale(1);
       gameObject.setDepth(depthCounter++); // Ensure dragged card gets a new depth value after drop
 
+
       let droppedInFoundation = false;
       foundations.forEach((box, index) => {
         const bounds = box.getData('bounds');
@@ -177,10 +178,10 @@ const PhaserGame = () => {
           // Remove card from tableau column
           const prevColumn = gameObject.getData('column');
           if (prevColumn !== undefined) {
-            const columnCards = deck.filter(card => card.getData('column') === prevColumn);
+            const columnCards = tableau.filter(card => card.getData('column') === prevColumn);
             const cardIndex = columnCards.indexOf(gameObject);
             if (cardIndex > -1) {
-              deck.splice(deck.indexOf(gameObject), 1);
+              tableau.splice(tableau.indexOf(gameObject), 1);
               const newTopCard = columnCards[cardIndex - 1];
               lastCardsInColumn[prevColumn] = newTopCard || null;
             }
@@ -239,7 +240,7 @@ const PhaserGame = () => {
       if (!droppedInFoundation) {
         let droppedInTableau = false;
         for (let col = 0; col < 7; col++) {
-          const columnCards = deck.filter(card => card.x === startX + col * spacingX);
+          const columnCards = tableau.filter(card => card.x === startX + col * spacingX);
           const lastCard = columnCards[columnCards.length - 1];
 
           if (lastCard && Phaser.Geom.Rectangle.Overlaps(lastCard.getBounds(), gameObject.getBounds())) {
@@ -264,7 +265,7 @@ const PhaserGame = () => {
               // Update the last card in the source and destination columns
               // Update source column's last card (previous top card)
               const sourceColumnIndex = gameObject.getData('column');
-              const sourceColumnCards = deck.filter(card => card.x === startX + sourceColumnIndex * spacingX);
+              const sourceColumnCards = tableau.filter(card => card.x === startX + sourceColumnIndex * spacingX);
               const newTopCard = sourceColumnCards[sourceColumnCards.length - 2]; // Get the new top card after the move
               lastCardsInColumn[sourceColumnIndex] = newTopCard || null; // If no card left, set null
 
