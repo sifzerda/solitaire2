@@ -32,10 +32,10 @@ const PhaserGame = () => {
   const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
 
   function preload() {
+    this.load.image('card_back', 'src/assets/cards/red_joker.png');
     ranks.forEach(rank => {
       suits.forEach(suit => {
         this.load.image(`${rank}_${suit}`, `src/assets/cards/${rank}_${suit}.png`);
-        this.load.image('card_back', 'src/assets/cards/red_joker.png');
       });
     });
   }
@@ -258,9 +258,16 @@ for (let col = 0; col < 7; col++) {
 
 
       // Recycle stockpile if a card is dragged from there
-      if (gameObject.getData('source') === 'stockpile') {
-        stockpile.pop();
-        updateStockpileInteractivity.call(this);
+      if (stockpile.length === 0 && revealedCards.length > 0) {
+        while (revealedCards.length) {
+          const card = revealedCards.pop();
+          card.setTexture('card_back');
+          card.setPosition(stockpileX, stockpileY - stockpile.length * 5);
+          card.setData('source', 'stockpile');
+          card.disableInteractive();
+          stockpile.push(card);
+        }
+        updateStockpileInteractivity(this);
       }
     });
   }
