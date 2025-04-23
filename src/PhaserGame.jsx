@@ -46,6 +46,8 @@ const PhaserGame = () => {
     const foundations = []; // Foundations for the game
     const revealedCards = []; // Area to hold revealed cards
 
+    let depthCounter = 0; // Initialize a depth counter
+
     const rows = 7;
     const cols = 7;
     const spacingX = 70;
@@ -64,6 +66,7 @@ const PhaserGame = () => {
       const card = createCard(this, stockpileX, stockpileY - i * 5, i);
       stockpile.push(card);
       card.setData('source', 'stockpile'); // Mark the source as stockpile
+      card.setDepth(depthCounter++); // Assign increasing depth
     }
 
     function updateStockpileInteractivity(scene) {
@@ -96,38 +99,41 @@ const PhaserGame = () => {
 
     updateStockpileInteractivity(this);
 
-// Deal cards to tableau (7 columns)
-const lastCardsInColumn = [];
-const allCards = [...deck, ...stockpile]; // Combine deck and stockpile for easy access
-let deckIndex = 0;
-for (let col = 0; col < 7; col++) {
-  for (let row = 0; row <= col; row++) {
-    const x = startX + col * spacingX;
-    const y = startY + row * spacingY;
-    const isFaceUp = (row === col); // Only the last card in the column is face-up
-    const card = createCard(this, x, y, deckIndex, 60, 90, 0x000000, isFaceUp);
+    // Deal cards to tableau (7 columns)
+    const lastCardsInColumn = [];
+    const allCards = [...deck, ...stockpile]; // Combine deck and stockpile for easy access
+    let deckIndex = 0;
+    for (let col = 0; col < 7; col++) {
+      for (let row = 0; row <= col; row++) {
+        const x = startX + col * spacingX;
+        const y = startY + row * spacingY;
+        const isFaceUp = (row === col); // Only the last card in the column is face-up
+        const card = createCard(this, x, y, deckIndex, 60, 90, 0x000000, isFaceUp);
 
-    // If the card is face-up, make it draggable
-    if (isFaceUp) {
-      this.input.setDraggable(card);
-    }
-    deck.push(card);
-    if (isFaceUp) {
-      lastCardsInColumn[col] = card;
-    }
-    deckIndex++;
-  }
-}
+        // Assign increasing depth to each card
+        card.setDepth(depthCounter++);
 
-  // Log the state of the last cards in the tableau columns before any updates
-  console.log("Before Update - Last Cards in Columns:");
-  lastCardsInColumn.forEach((card, index) => {
-    if (card) {
-      console.log(`top card of Column ${index + 1}: ${card.getData('rank')} of ${card.getData('suit')}`);
-    } else {
-      console.log(`top card of Column ${index + 1}: Empty`);
+        // If the card is face-up, make it draggable
+        if (isFaceUp) {
+          this.input.setDraggable(card);
+        }
+        deck.push(card);
+        if (isFaceUp) {
+          lastCardsInColumn[col] = card;
+        }
+        deckIndex++;
+      }
     }
-  });
+
+    // Log the state of the last cards in the tableau columns before any updates
+    console.log("Before Update - Last Cards in Columns:");
+    lastCardsInColumn.forEach((card, index) => {
+      if (card) {
+        console.log(`top card of Column ${index + 1}: ${card.getData('rank')} of ${card.getData('suit')}`);
+      } else {
+        console.log(`top card of Column ${index + 1}: Empty`);
+      }
+    });
 
     // Create foundation boxes
     const foundationX = 150;
@@ -147,7 +153,7 @@ for (let col = 0; col < 7; col++) {
     // Drag-and-drop events
     this.input.on('dragstart', (pointer, gameObject) => {
       gameObject.setScale(1.1);
-      gameObject.setDepth(1);
+      gameObject.setDepth(depthCounter++); // Ensure dragged card is on top
     });
 
     this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
@@ -156,7 +162,7 @@ for (let col = 0; col < 7; col++) {
 
     this.input.on('dragend', (pointer, gameObject) => {
       gameObject.setScale(1);
-      gameObject.setDepth(0);
+      gameObject.setDepth(depthCounter++); // Ensure dragged card gets a new depth value after drop
 
       let droppedInFoundation = false;
       foundations.forEach((box, index) => {
@@ -166,34 +172,34 @@ for (let col = 0; col < 7; col++) {
         if (Phaser.Geom.Rectangle.Overlaps(bounds, gameObject.getBounds())) {
           droppedInFoundation = true;
 
- // /////////////////////////////////////
+          // /////////////////////////////////////
 
-// Remove card from tableau column
-const prevColumn = gameObject.getData('column');
-if (prevColumn !== undefined) {
-  const columnCards = deck.filter(card => card.getData('column') === prevColumn);
-  const cardIndex = columnCards.indexOf(gameObject);
-  if (cardIndex > -1) {
-    deck.splice(deck.indexOf(gameObject), 1);
-    const newTopCard = columnCards[cardIndex - 1];
-    lastCardsInColumn[prevColumn] = newTopCard || null;
-  }
-  gameObject.setData('column', null); // Not in tableau anymore
-}
+          // Remove card from tableau column
+          const prevColumn = gameObject.getData('column');
+          if (prevColumn !== undefined) {
+            const columnCards = deck.filter(card => card.getData('column') === prevColumn);
+            const cardIndex = columnCards.indexOf(gameObject);
+            if (cardIndex > -1) {
+              deck.splice(deck.indexOf(gameObject), 1);
+              const newTopCard = columnCards[cardIndex - 1];
+              lastCardsInColumn[prevColumn] = newTopCard || null;
+            }
+            gameObject.setData('column', null); // Not in tableau anymore
+          }
 
-// Remove from revealed pile
-const revealedIndex = revealedCards.indexOf(gameObject);
-if (revealedIndex > -1) {
-  revealedCards.splice(revealedIndex, 1);
-}
+          // Remove from revealed pile
+          const revealedIndex = revealedCards.indexOf(gameObject);
+          if (revealedIndex > -1) {
+            revealedCards.splice(revealedIndex, 1);
+          }
 
-// Remove from stockpile
-if (gameObject.getData('source') === 'stockpile') {
-  const stockIndex = stockpile.indexOf(gameObject);
-  if (stockIndex > -1) {
-    stockpile.splice(stockIndex, 1);
-  }
-}
+          // Remove from stockpile
+          if (gameObject.getData('source') === 'stockpile') {
+            const stockIndex = stockpile.indexOf(gameObject);
+            if (stockIndex > -1) {
+              stockpile.splice(stockIndex, 1);
+            }
+          }
           //////////////////////////////////
 
           if (index === 4) {
@@ -242,8 +248,8 @@ if (gameObject.getData('source') === 'stockpile') {
             const lastCardRank = lastCard.getData('rank');
             const lastCardSuit = lastCard.getData('suit');
 
-            const isDescendingOrder = (['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'].indexOf(draggedRank) === 
-                                      ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'].indexOf(lastCardRank) - 1);
+            const isDescendingOrder = (['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'].indexOf(draggedRank) ===
+              ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'].indexOf(lastCardRank) - 1);
 
             const isAlternateColor = (draggedSuit === 'hearts' || draggedSuit === 'diamonds') !== (lastCardSuit === 'hearts' || lastCardSuit === 'diamonds');
 
@@ -251,20 +257,20 @@ if (gameObject.getData('source') === 'stockpile') {
               lastCard.setData('card', gameObject);
               gameObject.setPosition(lastCard.x, lastCard.y + spacingY);
               droppedInTableau = true;
-    
+
               // Log the card movement
-              console.log(`Moved card ${gameObject.getData('rank')} of ${gameObject.getData('suit')} to column ${col + 1}`);    
-    
+              console.log(`Moved card ${gameObject.getData('rank')} of ${gameObject.getData('suit')} to column ${col + 1}`);
+
               // Update the last card in the source and destination columns
-                // Update source column's last card (previous top card)
-                const sourceColumnIndex = gameObject.getData('column');
-                const sourceColumnCards = deck.filter(card => card.x === startX + sourceColumnIndex * spacingX);
-                const newTopCard = sourceColumnCards[sourceColumnCards.length - 2]; // Get the new top card after the move
-                lastCardsInColumn[sourceColumnIndex] = newTopCard || null; // If no card left, set null
-    
-                // Update destination column's last card (new top card)
-                lastCardsInColumn[col] = gameObject;
-                gameObject.setData('column', col);  // Update the column data for the dragged card
+              // Update source column's last card (previous top card)
+              const sourceColumnIndex = gameObject.getData('column');
+              const sourceColumnCards = deck.filter(card => card.x === startX + sourceColumnIndex * spacingX);
+              const newTopCard = sourceColumnCards[sourceColumnCards.length - 2]; // Get the new top card after the move
+              lastCardsInColumn[sourceColumnIndex] = newTopCard || null; // If no card left, set null
+
+              // Update destination column's last card (new top card)
+              lastCardsInColumn[col] = gameObject;
+              gameObject.setData('column', col);  // Update the column data for the dragged card
 
               break;
             }
@@ -276,15 +282,15 @@ if (gameObject.getData('source') === 'stockpile') {
         }
       }
 
-       // Log the state of the last cards in the tableau columns after the update
-  console.log("After Update - Last Cards in Columns:");
-  lastCardsInColumn.forEach((card, index) => {
-    if (card) {
-      console.log(`Column ${index + 1}: ${card.getData('rank')} of ${card.getData('suit')}`);
-    } else {
-      console.log(`Column ${index + 1}: Empty`);
-    }
-  });
+      // Log the state of the last cards in the tableau columns after the update
+      console.log("After Update - Last Cards in Columns:");
+      lastCardsInColumn.forEach((card, index) => {
+        if (card) {
+          console.log(`Column ${index + 1}: ${card.getData('rank')} of ${card.getData('suit')}`);
+        } else {
+          console.log(`Column ${index + 1}: Empty`);
+        }
+      });
 
 
       // Recycle stockpile if a card is dragged from there
