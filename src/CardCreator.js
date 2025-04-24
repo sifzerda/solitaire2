@@ -60,7 +60,7 @@ export function createCard(scene, x, y, index, cardWidth = 60, cardHeight = 90, 
     cardContainer.setData('isFaceUp', !isFaceUp); // Toggle the state
   };
 
-// Add hover effect only for face-up cards
+// Add hover effect for face-up cards
 cardContainer.on('pointerover', () => {
   if (cardContainer.getData('isFaceUp')) {
     cardContainer.setScale(1.05); // Slightly enlarge on hover
