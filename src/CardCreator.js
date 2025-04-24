@@ -37,7 +37,7 @@ export function createCard(scene, x, y, index, cardWidth = 60, cardHeight = 90, 
 
   // Make the container interactive (draggable)
   cardContainer.setInteractive(new Phaser.Geom.Rectangle(-cardWidth / 2, -cardHeight / 2, cardWidth, cardHeight), Phaser.Geom.Rectangle.Contains);
-
+  
   // Store card data (rank, suit, index, and whether it is face-up)
   cardContainer.setData('rank', rank);
   cardContainer.setData('suit', suit);
@@ -59,6 +59,15 @@ export function createCard(scene, x, y, index, cardWidth = 60, cardHeight = 90, 
     }
     cardContainer.setData('isFaceUp', !isFaceUp); // Toggle the state
   };
+
+    // Add hover effect
+    cardContainer.on('pointerover', () => {
+      cardContainer.setScale(1.05); // Slightly enlarge on hover
+    });
+  
+    cardContainer.on('pointerout', () => {
+      cardContainer.setScale(1); // Return to normal size
+    });
 
   return cardContainer; // Return the container instead of just the card
 }
