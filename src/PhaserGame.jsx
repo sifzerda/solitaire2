@@ -115,6 +115,9 @@ const PhaserGame = () => {
 
         card.setData('column', col); // Store the column index
 
+        // Log each card's initial face-up status
+        console.log(`Created card ${card.getData('rank')} of ${card.getData('suit')} at column ${col + 1}, row ${row + 1} - Face Status: ${isFaceUp ? "Face Up" : "Face Down"}`);
+
         // If the card is face-up, make it draggable
         if (isFaceUp) {
           this.input.setDraggable(card);
@@ -131,9 +134,10 @@ const PhaserGame = () => {
     console.log("Before Update - Last Cards in Columns:");
     lastCardsInColumn.forEach((card, index) => {
       if (card) {
-        console.log(`top card of Column ${index + 1}: ${card.getData('rank')} of ${card.getData('suit')}`);
+        const faceStatus = card.isFaceUp ? "Face Up" : "Face Down";
+        console.log(`Top card of Column ${index + 1}: ${card.getData('rank')} of ${card.getData('suit')} - ${faceStatus}`);
       } else {
-        console.log(`top card of Column ${index + 1}: Empty`);
+        console.log(`Top card of Column ${index + 1}: Empty`);
       }
     });
 
@@ -290,7 +294,8 @@ const PhaserGame = () => {
       console.log("After Update - Last Cards in Columns:");
       lastCardsInColumn.forEach((card, index) => {
         if (card) {
-          console.log(`Column ${index + 1}: ${card.getData('rank')} of ${card.getData('suit')}`);
+          const faceStatus = card.isFaceUp ? "Face Up" : "Face Down";
+          console.log(`Top card of Column ${index + 1}: ${card.getData('rank')} of ${card.getData('suit')} - ${faceStatus}`);
         } else {
           console.log(`Column ${index + 1}: Empty`);
         }
