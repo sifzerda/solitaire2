@@ -103,6 +103,9 @@ const PhaserGame = () => {
     const allCards = [...tableau, ...stockpile]; // Combine tableau and stockpile for easy access
     let tableauIndex = 0;
 
+        // Shuffle the card positions (this is a simple random shuffle for the animation)
+        const shuffleDelay = 50; // Delay between each card's movement
+
     for (let col = 0; col < 7; col++) {
       for (let row = 0; row <= col; row++) {
         const x = startX + col * spacingX;
@@ -123,6 +126,37 @@ const PhaserGame = () => {
         tableauIndex++;
         // Push the card into its respective column
         columns[col].push(card);  // This is the fix
+
+// SHUFFLE ANIMATION ////////////////////////////////////
+
+                    // Shuffle animation: randomly assign an offset position and animate it
+                    const randomOffsetX = Phaser.Math.Between(-100, 100); // Random horizontal offset
+                    const randomOffsetY = Phaser.Math.Between(-100, 100); // Random vertical offset
+                    const targetX = x + randomOffsetX; // Apply the offset to the target position
+                    const targetY = y + randomOffsetY;
+
+ // Animate the card from the stockpile or starting position to the final position
+            card.setPosition(stockpileX, stockpileY); // Start from the stockpile position
+this.tweens.add({
+    targets: card,
+    x: targetX,
+    y: targetY,
+    duration: 500,
+    ease: 'Power2',
+    delay: tableauIndex * shuffleDelay, // Sequential delay
+    onComplete: () => {
+        this.tweens.add({
+            targets: card,
+            x: x,
+            y: y,
+            duration: 300,
+            ease: 'Power1',
+        });
+    },
+});
+
+////////////////////////////////////////////////////////////
+
       }
     }
 
