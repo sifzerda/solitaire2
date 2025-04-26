@@ -142,8 +142,12 @@ const PhaserGame = () => {
                     const targetX = x + randomOffsetX; // Apply the offset to the target position
                     const targetY = y + randomOffsetY;
 
- // Animate the card from the stockpile or starting position to the final position
-            card.setPosition(stockpileX, stockpileY); // Start from the stockpile position
+// Initial off-screen position (place it outside the screen, e.g., -200px)
+const offScreenX = -200;  // Adjust the value depending on the width of your screen
+const offScreenY = Phaser.Math.Between(-200, -500); // Random off-screen vertical position
+
+// Create card and set its initial off-screen position
+card.setPosition(offScreenX, offScreenY);
 this.tweens.add({
     targets: card,
     x: targetX,
