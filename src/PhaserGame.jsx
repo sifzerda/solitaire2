@@ -46,6 +46,8 @@ const PhaserGame = () => {
     const foundations = []; // Foundations for the game
     const revealedCards = []; // Area to hold revealed cards
 
+    const columns = [[], [], [], [], [], [], []];
+
     const rows = 7;
     const cols = 7;
     const spacingX = 70;
@@ -100,14 +102,13 @@ const PhaserGame = () => {
     const lastCardsInColumn = [];
     const allCards = [...tableau, ...stockpile]; // Combine tableau and stockpile for easy access
     let tableauIndex = 0;
+
     for (let col = 0; col < 7; col++) {
       for (let row = 0; row <= col; row++) {
         const x = startX + col * spacingX;
         const y = startY + row * spacingY;
         const isFaceUp = (row === col); // Only the last card in the column is face-up
         const card = createCard(this, x, y, tableauIndex, 60, 90, 0x000000, isFaceUp);
-
-
 
         card.setData('column', col); // Store the column index
 
@@ -120,6 +121,8 @@ const PhaserGame = () => {
           lastCardsInColumn[col] = card;
         }
         tableauIndex++;
+        // Push the card into its respective column
+        columns[col].push(card);  // This is the fix
       }
     }
 
@@ -173,17 +176,17 @@ const PhaserGame = () => {
               tableau.splice(tableau.indexOf(gameObject), 1);
               const newTopCard = columnCards[cardIndex - 1];
               lastCardsInColumn[prevColumn] = newTopCard || null;
-// AUTO-FLIP NEXT CARD
-// If there's a face-down card below, make it clickable to flip
-if (newTopCard && !newTopCard.getData('isFaceUp')) {
-  newTopCard.setInteractive();
-  newTopCard.on('pointerdown', function handleFlip() {
-    newTopCard.flipCard();
-    scene.input.setDraggable(newTopCard); // Make it draggable after flipping
-    newTopCard.off('pointerdown', handleFlip); // Remove the listener
-  });
-}
-//////////////////////
+              // AUTO-FLIP NEXT CARD
+              // If there's a face-down card below, make it clickable to flip
+              if (newTopCard && !newTopCard.getData('isFaceUp')) {
+                newTopCard.setInteractive();
+                newTopCard.on('pointerdown', function handleFlip() {
+                  newTopCard.flipCard();
+                  scene.input.setDraggable(newTopCard); // Make it draggable after flipping
+                  newTopCard.off('pointerdown', handleFlip); // Remove the listener
+                });
+              }
+              //////////////////////
             }
             gameObject.setData('column', null); // Not in tableau anymore
           }
@@ -262,9 +265,15 @@ if (newTopCard && !newTopCard.getData('isFaceUp')) {
               // Update the last card in the source and destination columns
               // Update source column's last card (previous top card)
               const sourceColumnIndex = gameObject.getData('column');
-              const sourceColumnCards = tableau.filter(card => card.x === startX + sourceColumnIndex * spacingX);
-              const newTopCard = sourceColumnCards[sourceColumnCards.length - 2]; // Get the new top card after the move
-              lastCardsInColumn[sourceColumnIndex] = newTopCard || null; // If no card left, set null
+              const sourceColumnCards = columns[sourceColumnIndex];
+              const movedCardIndex = sourceColumnCards.indexOf(gameObject);
+              // Remove the card from its source column
+              if (movedCardIndex > -1) {
+                sourceColumnCards.splice(movedCardIndex, 1);
+              }
+              // New top card
+              const newTopCard = sourceColumnCards.at(-1); // <- easier and safer than -2 logic
+              lastCardsInColumn[sourceColumnIndex] = newTopCard || null;
 
               // Update destination column's last card (new top card)
               lastCardsInColumn[col] = gameObject;
@@ -279,6 +288,24 @@ if (newTopCard && !newTopCard.getData('isFaceUp')) {
           gameObject.setPosition(gameObject.input.dragStartX, gameObject.input.dragStartY);
         }
       }
+
+
+
+
+      // Log the state of the last cards in the tableau columns after the update
+      console.log("After Update - Last Cards in Columns:");
+      lastCardsInColumn.forEach((card, index) => {
+        if (card) {
+          const faceStatus = card.isFaceUp ? "Face Up" : "Face Down";
+          console.log(`Top card of Column ${index + 1}: ${card.getData('rank')} of ${card.getData('suit')} - ${faceStatus}`);
+        } else {
+          console.log(`Column ${index + 1}: Empty`);
+        }
+      });
+
+
+
+
 
       // Recycle stockpile if a card is dragged from there
       if (stockpile.length === 0 && revealedCards.length > 0) {
