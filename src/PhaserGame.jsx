@@ -335,24 +335,6 @@ this.tweens.add({
         }
       }
 
-
-
-
-      // Log the state of the last cards in the tableau columns after the update
-      console.log("After Update - Last Cards in Columns:");
-      lastCardsInColumn.forEach((card, index) => {
-        if (card) {
-          const faceStatus = card.isFaceUp ? "Face Up" : "Face Down";
-          console.log(`Top card of Column ${index + 1}: ${card.getData('rank')} of ${card.getData('suit')} - ${faceStatus}`);
-        } else {
-          console.log(`Column ${index + 1}: Empty`);
-        }
-      });
-
-
-
-
-
       // Recycle stockpile if a card is dragged from there
       if (stockpile.length === 0 && revealedCards.length > 0) {
         while (revealedCards.length) {
