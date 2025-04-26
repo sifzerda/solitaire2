@@ -47,17 +47,11 @@ export function createCard(scene, x, y, index, cardWidth = 60, cardHeight = 90, 
 
   // Flip the card (animation)
   cardContainer.flipCard = function() {
-    const isFaceUp = cardImage.alpha === 1;
-    if (isFaceUp) {
-      // Flip to face-down
-      cardImage.setAlpha(0);
-      cardBack.setAlpha(1);
-    } else {
-      // Flip to face-up
-      cardImage.setAlpha(1);
-      cardBack.setAlpha(0);
+    if (!cardContainer.getData('isFaceUp')) {
+      cardImage.setAlpha(1);     // Show the face
+      cardBack.setAlpha(0);      // Hide the back
+      cardContainer.setData('isFaceUp', true);
     }
-    cardContainer.setData('isFaceUp', !isFaceUp); // Toggle the state
   };
 
 // Add hover effect for face-up cards
@@ -71,6 +65,18 @@ cardContainer.on('pointerout', () => {
   // Always reset scale when pointer leaves, even if it wasn’t face-up
   cardContainer.setScale(1);
 });
+
+
+
+  // Log message when a face-down card is clicked
+  cardContainer.on('pointerdown', () => {
+    if (!cardContainer.getData('isFaceUp')) {
+      console.log(`Clicked on a face-down card: ${rank} of ${suit}`);
+      cardContainer.flipCard(); // Flip the card when clicked
+    }
+  });
+
+
 
   return cardContainer; // Return the container instead of just the card
 }

@@ -1,3 +1,5 @@
+// with tableau topcard console logs
+
 import { useRef, useEffect } from 'react';
 import Phaser from 'phaser';
 import { createFoundationBox } from './foundations'; // Import foundation functions
@@ -115,6 +117,9 @@ const PhaserGame = () => {
 
         card.setData('column', col); // Store the column index
 
+        // Log each card's initial face-up status
+        console.log(`Created card ${card.getData('rank')} of ${card.getData('suit')} at column ${col + 1}, row ${row + 1} - Face Status: ${isFaceUp ? "Face Up" : "Face Down"}`);
+
         // If the card is face-up, make it draggable
         if (isFaceUp) {
           this.input.setDraggable(card);
@@ -126,6 +131,17 @@ const PhaserGame = () => {
         tableauIndex++;
       }
     }
+
+    // Log the state of the last cards in the tableau columns before any updates
+    console.log("Before Update - Last Cards in Columns:");
+    lastCardsInColumn.forEach((card, index) => {
+      if (card) {
+        const faceStatus = card.isFaceUp ? "Face Up" : "Face Down";
+        console.log(`Top card of Column ${index + 1}: ${card.getData('rank')} of ${card.getData('suit')} - ${faceStatus}`);
+      } else {
+        console.log(`Top card of Column ${index + 1}: Empty`);
+      }
+    });
 
     // Create foundation boxes
     const foundationX = 150;
@@ -177,17 +193,6 @@ const PhaserGame = () => {
               tableau.splice(tableau.indexOf(gameObject), 1);
               const newTopCard = columnCards[cardIndex - 1];
               lastCardsInColumn[prevColumn] = newTopCard || null;
-// AUTO-FLIP NEXT CARD
-// If there's a face-down card below, make it clickable to flip
-if (newTopCard && !newTopCard.getData('isFaceUp')) {
-  newTopCard.setInteractive();
-  newTopCard.on('pointerdown', function handleFlip() {
-    newTopCard.flipCard();
-    scene.input.setDraggable(newTopCard); // Make it draggable after flipping
-    newTopCard.off('pointerdown', handleFlip); // Remove the listener
-  });
-}
-//////////////////////
             }
             gameObject.setData('column', null); // Not in tableau anymore
           }
@@ -263,6 +268,9 @@ if (newTopCard && !newTopCard.getData('isFaceUp')) {
               gameObject.setPosition(lastCard.x, lastCard.y + spacingY);
               droppedInTableau = true;
 
+              // Log the card movement
+              console.log(`Moved card ${gameObject.getData('rank')} of ${gameObject.getData('suit')} to column ${col + 1}`);
+
               // Update the last card in the source and destination columns
               // Update source column's last card (previous top card)
               const sourceColumnIndex = gameObject.getData('column');
@@ -283,6 +291,18 @@ if (newTopCard && !newTopCard.getData('isFaceUp')) {
           gameObject.setPosition(gameObject.input.dragStartX, gameObject.input.dragStartY);
         }
       }
+
+      // Log the state of the last cards in the tableau columns after the update
+      console.log("After Update - Last Cards in Columns:");
+      lastCardsInColumn.forEach((card, index) => {
+        if (card) {
+          const faceStatus = card.isFaceUp ? "Face Up" : "Face Down";
+          console.log(`Top card of Column ${index + 1}: ${card.getData('rank')} of ${card.getData('suit')} - ${faceStatus}`);
+        } else {
+          console.log(`Column ${index + 1}: Empty`);
+        }
+      });
+
 
       // Recycle stockpile if a card is dragged from there
       if (stockpile.length === 0 && revealedCards.length > 0) {
