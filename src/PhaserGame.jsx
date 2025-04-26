@@ -107,6 +107,8 @@ const PhaserGame = () => {
         const isFaceUp = (row === col); // Only the last card in the column is face-up
         const card = createCard(this, x, y, tableauIndex, 60, 90, 0x000000, isFaceUp);
 
+
+
         card.setData('column', col); // Store the column index
 
         // If the card is face-up, make it draggable
@@ -238,7 +240,7 @@ if (newTopCard && !newTopCard.getData('isFaceUp')) {
       if (!droppedInFoundation) {
         let droppedInTableau = false;
         for (let col = 0; col < 7; col++) {
-          const columnCards = tableau.filter(card => card.x === startX + col * spacingX);
+          const columnCards = tableau.filter(card => card.getData('column') === col);
           const lastCard = columnCards[columnCards.length - 1];
 
           if (lastCard && Phaser.Geom.Rectangle.Overlaps(lastCard.getBounds(), gameObject.getBounds())) {
