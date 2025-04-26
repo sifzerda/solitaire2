@@ -46,8 +46,6 @@ const PhaserGame = () => {
     const foundations = []; // Foundations for the game
     const revealedCards = []; // Area to hold revealed cards
 
-    let depthCounter = 0; // Initialize a depth counter
-
     const rows = 7;
     const cols = 7;
     const spacingX = 70;
@@ -66,7 +64,6 @@ const PhaserGame = () => {
       const card = createCard(this, stockpileX, stockpileY - i * 5, i);
       stockpile.push(card);
       card.setData('source', 'stockpile'); // Mark the source as stockpile
-      card.setDepth(depthCounter++); // Assign increasing depth
     }
 
     function updateStockpileInteractivity(scene) {
@@ -110,9 +107,6 @@ const PhaserGame = () => {
         const isFaceUp = (row === col); // Only the last card in the column is face-up
         const card = createCard(this, x, y, tableauIndex, 60, 90, 0x000000, isFaceUp);
 
-        // Assign increasing depth to each card
-        card.setDepth(depthCounter++);
-
         card.setData('column', col); // Store the column index
 
         // If the card is face-up, make it draggable
@@ -145,7 +139,7 @@ const PhaserGame = () => {
     // Drag-and-drop events
     this.input.on('dragstart', (pointer, gameObject) => {
       gameObject.setScale(1.1);
-      gameObject.setDepth(depthCounter++); // Ensure dragged card is on top
+      this.children.bringToTop(gameObject); // Ensure dragged card is on top
     });
 
     this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
@@ -154,7 +148,7 @@ const PhaserGame = () => {
 
     this.input.on('dragend', (pointer, gameObject) => {
       gameObject.setScale(1);
-      gameObject.setDepth(depthCounter++); // Ensure dragged card gets a new depth value after drop
+      this.children.bringToTop(gameObject); // Ensure dragged card gets a new depth value after drop
 
 
       let droppedInFoundation = false;
