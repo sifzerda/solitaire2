@@ -98,6 +98,13 @@ const PhaserGame = () => {
 
     updateStockpileInteractivity(this);
 
+
+
+
+
+
+    
+
     // Deal cards to tableau (7 columns)
     const lastCardsInColumn = [];
     const allCards = [...tableau, ...stockpile]; // Combine tableau and stockpile for easy access
