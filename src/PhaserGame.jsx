@@ -180,11 +180,12 @@ const PhaserGame = () => {
               // If there's a face-down card below, make it clickable to flip
               if (newTopCard && !newTopCard.getData('isFaceUp')) {
                 newTopCard.setInteractive();
-                newTopCard.on('pointerdown', function handleFlip() {
+                const handleFlip = () => {
                   newTopCard.flipCard();
-                  scene.input.setDraggable(newTopCard); // Make it draggable after flipping
-                  newTopCard.off('pointerdown', handleFlip); // Remove the listener
-                });
+                  scene.input.setDraggable(newTopCard);
+                  newTopCard.off('pointerdown', handleFlip);
+                };
+                newTopCard.on('pointerdown', handleFlip);
               }
               //////////////////////
             }
