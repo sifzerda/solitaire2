@@ -66,7 +66,7 @@ cardContainer.on('pointerout', () => {
   cardContainer.setScale(1);
 });
 
-
+//////////////////
 
   // Log message when a face-down card is clicked
   cardContainer.on('pointerdown', () => {
@@ -76,7 +76,7 @@ cardContainer.on('pointerout', () => {
     }
   });
 
-
+///////////////////
 
   return cardContainer; // Return the container instead of just the card
 }
