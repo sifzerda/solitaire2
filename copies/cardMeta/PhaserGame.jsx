@@ -45,7 +45,7 @@ const PhaserGame = () => {
       [array[i], array[j]] = [array[j], array[i]];
     }
   }
-  
+
   shuffleDeck(deck); // Shuffle the deck
 
   function preload() {
@@ -83,7 +83,13 @@ const PhaserGame = () => {
       const cardData = deck.pop(); // Take a real card
       const card = createCard(this, stockpileX, stockpileY - i * 5, cardData, 60, 90, 0x000000, false);
       stockpile.push(card);
-      card.setData('source', 'stockpile');
+
+      card.setData('cardMeta', {
+        pileType: 'stockpile',
+        pileIndex: stockpile.length - 1,
+        positionInPile: i
+      });
+
     }
 
     function updateStockpileInteractivity(scene) {
@@ -121,8 +127,8 @@ const PhaserGame = () => {
     const allCards = [...tableau, ...stockpile]; // Combine tableau and stockpile for easy access
     let tableauIndex = 0;
 
-        // Shuffle the card positions (this is a simple random shuffle for the animation)
-        const shuffleDelay = 50; // Delay between each card's movement
+    // Shuffle the card positions (this is a simple random shuffle for the animation)
+    const shuffleDelay = 50; // Delay between each card's movement
 
     for (let col = 0; col < 7; col++) {
       for (let row = 0; row <= col; row++) {
@@ -132,7 +138,11 @@ const PhaserGame = () => {
         const cardData = deck.pop(); // Get the top card from shuffled deck
         const card = createCard(this, x, y, cardData, 60, 90, 0x000000, isFaceUp);
 
-        card.setData('column', col); // Store the column index
+        card.setData('cardMeta', {
+          pileType: 'tableau',
+          pileIndex: col,  // This will store the column number
+          positionInPile: columns[col].length // This will be the position within that column
+        });
 
         // If the card is face-up, make it draggable
         if (isFaceUp) {
@@ -146,39 +156,39 @@ const PhaserGame = () => {
         // Push the card into its respective column
         columns[col].push(card);  // This is the fix
 
-// SHUFFLE ANIMATION ////////////////////////////////////
+        // SHUFFLE ANIMATION ////////////////////////////////////
 
-                    // Shuffle animation: randomly assign an offset position and animate it
-                    const randomOffsetX = Phaser.Math.Between(-100, 100); // Random horizontal offset
-                    const randomOffsetY = Phaser.Math.Between(-100, 100); // Random vertical offset
-                    const targetX = x + randomOffsetX; // Apply the offset to the target position
-                    const targetY = y + randomOffsetY;
+        // Shuffle animation: randomly assign an offset position and animate it
+        const randomOffsetX = Phaser.Math.Between(-100, 100); // Random horizontal offset
+        const randomOffsetY = Phaser.Math.Between(-100, 100); // Random vertical offset
+        const targetX = x + randomOffsetX; // Apply the offset to the target position
+        const targetY = y + randomOffsetY;
 
-// Initial off-screen position (place it outside the screen, e.g., -200px)
-const offScreenX = -200;  // Adjust the value depending on the width of your screen
-const offScreenY = Phaser.Math.Between(-200, -500); // Random off-screen vertical position
+        // Initial off-screen position (place it outside the screen, e.g., -200px)
+        const offScreenX = -200;  // Adjust the value depending on the width of your screen
+        const offScreenY = Phaser.Math.Between(-200, -500); // Random off-screen vertical position
 
-// Create card and set its initial off-screen position
-card.setPosition(offScreenX, offScreenY);
-this.tweens.add({
-    targets: card,
-    x: targetX,
-    y: targetY,
-    duration: 500,
-    ease: 'Power2',
-    delay: tableauIndex * shuffleDelay, // Sequential delay
-    onComplete: () => {
+        // Create card and set its initial off-screen position
+        card.setPosition(offScreenX, offScreenY);
         this.tweens.add({
-            targets: card,
-            x: x,
-            y: y,
-            duration: 300,
-            ease: 'Power1',
+          targets: card,
+          x: targetX,
+          y: targetY,
+          duration: 500,
+          ease: 'Power2',
+          delay: tableauIndex * shuffleDelay, // Sequential delay
+          onComplete: () => {
+            this.tweens.add({
+              targets: card,
+              x: x,
+              y: y,
+              duration: 300,
+              ease: 'Power1',
+            });
+          },
         });
-    },
-});
 
-////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////
 
       }
     }
@@ -212,10 +222,8 @@ this.tweens.add({
       gameObject.setScale(1);
       this.children.bringToTop(gameObject); // Ensure dragged card gets a new depth value after drop
 
-
       let droppedInFoundation = false;
       foundations.forEach((box, index) => {
-
         const bounds = box.getData('bounds');
         const currentCard = box.getData('card');
 
@@ -239,7 +247,7 @@ this.tweens.add({
                 newTopCard.setInteractive();
                 const handleFlip = () => {
                   newTopCard.flipCard();
-                  this.input.setDraggable(newTopCard);
+                  scene.input.setDraggable(newTopCard);
                   newTopCard.off('pointerdown', handleFlip);
                 };
                 newTopCard.on('pointerdown', handleFlip);
@@ -257,6 +265,14 @@ this.tweens.add({
 
           // Remove from stockpile
           if (gameObject.getData('source') === 'stockpile') {
+
+            // Update source as 'stockpile' and reset cardMeta if needed
+            gameObject.setData('cardMeta', {
+              pileType: 'stockpile',
+              pileIndex: stockpile.length - 1,
+              positionInPile: stockpile.length - 1
+            });
+
             const stockIndex = stockpile.indexOf(gameObject);
             if (stockIndex > -1) {
               stockpile.splice(stockIndex, 1);
@@ -294,6 +310,15 @@ this.tweens.add({
               }
             }
           }
+
+      // **Update the cardMeta here for foundation drop**
+      const draggedCard = gameObject;
+      draggedCard.setData('cardMeta', {
+        pileType: 'foundation',
+        pileIndex: index,  // foundation index
+        positionInPile: 0  // foundation is always a single card
+      });
+
         }
       });
 
