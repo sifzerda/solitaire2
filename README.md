@@ -22,6 +22,12 @@
 + [x] Make facedown cards non-draggable (and faceup cards draggable), but if a card is topCard and facedown...
 + [ ] ...you can click it and change it to faceup and draggable
 
++ [ ] a full adjusted dragend function that supports multi-card movement and handle dropping the whole stack properly
+
++ [ ] Highlight valid drop areas: When dragging a card, you could light up the columns or foundations where it can legally be dropped.
+
++ [ ] Double-click to auto-move to foundation: double-clicking an Ace or next-in-sequence card automatically jumps it to the right foundation.
+
 ### UI:
 
 + [ ] add button to restart (re-initialize cards) game

@@ -31,6 +31,23 @@ const PhaserGame = () => {
   const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
   const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
 
+  // Build full deck
+  let deck = [];
+  ranks.forEach(rank => {
+    suits.forEach(suit => {
+      deck.push({ rank, suit });
+    });
+  });
+
+  function shuffleDeck(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+  
+  shuffleDeck(deck); // Shuffle the deck
+
   function preload() {
     this.load.image('card_back', 'src/assets/cards/red_joker.png');
     ranks.forEach(rank => {
@@ -63,9 +80,10 @@ const PhaserGame = () => {
 
     // Stockpile initialization
     for (let i = 0; i < 24; i++) {
-      const card = createCard(this, stockpileX, stockpileY - i * 5, i);
+      const cardData = deck.pop(); // Take a real card
+      const card = createCard(this, stockpileX, stockpileY - i * 5, cardData, 60, 90, 0x000000, false);
       stockpile.push(card);
-      card.setData('source', 'stockpile'); // Mark the source as stockpile
+      card.setData('source', 'stockpile');
     }
 
     function updateStockpileInteractivity(scene) {
@@ -98,13 +116,6 @@ const PhaserGame = () => {
 
     updateStockpileInteractivity(this);
 
-
-
-
-
-
-    
-
     // Deal cards to tableau (7 columns)
     const lastCardsInColumn = [];
     const allCards = [...tableau, ...stockpile]; // Combine tableau and stockpile for easy access
@@ -118,7 +129,8 @@ const PhaserGame = () => {
         const x = startX + col * spacingX;
         const y = startY + row * spacingY;
         const isFaceUp = (row === col); // Only the last card in the column is face-up
-        const card = createCard(this, x, y, tableauIndex, 60, 90, 0x000000, isFaceUp);
+        const cardData = deck.pop(); // Get the top card from shuffled deck
+        const card = createCard(this, x, y, cardData, 60, 90, 0x000000, isFaceUp);
 
         card.setData('column', col); // Store the column index
 

@@ -1,10 +1,5 @@
-export function createCard(scene, x, y, index, cardWidth = 60, cardHeight = 90, outlineColor = 0x000000, isFaceUp = false) {
-  const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-  const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
-
-  const rank = ranks[index % ranks.length]; // Assign rank based on index
-  const suit = suits[Math.floor(index / ranks.length)]; // Assign suit based on index
-
+export function createCard(scene, x, y, cardData, cardWidth = 60, cardHeight = 90, outlineColor = 0x000000, isFaceUp = false) {
+  const { rank, suit } = cardData; // Destructure rank and suit from cardData
   // Create a container to group card elements
   const cardContainer = scene.add.container(x, y);
 
@@ -41,7 +36,6 @@ export function createCard(scene, x, y, index, cardWidth = 60, cardHeight = 90, 
   // Store card data (rank, suit, index, and whether it is face-up)
   cardContainer.setData('rank', rank);
   cardContainer.setData('suit', suit);
-  cardContainer.setData('index', index);
   cardContainer.setData('cardBack', cardBack);
   cardContainer.setData('isFaceUp', isFaceUp); // Track the face-up/down state
 
