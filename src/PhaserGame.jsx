@@ -282,9 +282,8 @@ this.tweens.add({
               const currentRank = currentCard.getData('rank');
               const currentSuit = currentCard.getData('suit');
 
-              const rankOrder = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-              const nextRankIndex = rankOrder.indexOf(currentRank) + 1;
-              const nextRank = rankOrder[nextRankIndex];
+              const nextRankIndex = ranks.indexOf(currentRank) + 1;
+              const nextRank = ranks[nextRankIndex];
 
               if (draggedRank === nextRank && draggedSuit === currentSuit) {
                 box.setData('card', gameObject);
