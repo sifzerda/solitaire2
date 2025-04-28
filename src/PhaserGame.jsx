@@ -64,6 +64,7 @@ const PhaserGame = () => {
     const revealedCards = []; // Area to hold revealed cards
 
     const columns = [[], [], [], [], [], [], []];
+    let depthCounter = 1; // Starts low
 
     const rows = 7;
     const cols = 7;
