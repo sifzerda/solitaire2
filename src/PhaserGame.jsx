@@ -81,35 +81,37 @@ const PhaserGame = () => {
       card.setData('source', 'stockpile');
     }
 
-    function updateStockpileInteractivity(scene) {
+    // Stockpile cycling:
+    function handleStockpileCycle(scene) {
+      // Disable interaction for all cards in the stockpile
       stockpile.forEach(card => card.disableInteractive());
-
-      const topCard = stockpile[stockpile.length - 1];
+    
+      const topCard = stockpile.at(-1); // Get the top card (last in array)
+    
       if (topCard) {
+        // Make the top card interactive
         topCard.setInteractive();
-        topCard.on('pointerdown', () => {
-          cycleStockpile(scene); // Pass scene to cycle stockpile
+        topCard.once('pointerdown', () => {
+          // Move the card to revealed pile
+          stockpile.pop();
+          topCard.setPosition(revealedX, revealedY);
+          topCard.flipCard();
+          topCard.setInteractive();
+          scene.input.setDraggable(topCard);
+          revealedCards.push(topCard);
+    
+          // Rearrange stockpile card positions
+          stockpile.forEach((card, index) => {
+            card.setPosition(stockpileX, stockpileY - index * 5);
+          });
+    
+          // Prepare next top card
+          handleStockpileCycle(scene);
         });
       }
     }
 
-    function cycleStockpile(scene) {
-      if (stockpile.length > 0) {
-        const topCard = stockpile.pop();
-        topCard.setPosition(revealedX, revealedY);
-        topCard.setInteractive();
-        scene.input.setDraggable(topCard);
-        revealedCards.push(topCard);
-        topCard.flipCard();
-        topCard.off('pointerdown');
-        stockpile.forEach((card, index) => {
-          card.setPosition(stockpileX, stockpileY - index * 5);
-        });
-        updateStockpileInteractivity(scene);
-      }
-    }
-
-    updateStockpileInteractivity(this);
+    handleStockpileCycle(this);
 
     // Deal cards to tableau (7 columns)
     const lastCardsInColumn = [];
@@ -351,7 +353,7 @@ this.tweens.add({
           card.disableInteractive();
           stockpile.push(card);
         }
-        updateStockpileInteractivity(this);
+        handleStockpileCycle(this);
       }
     });
   }
