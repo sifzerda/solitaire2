@@ -57,16 +57,13 @@ const PhaserGame = () => {
     const stockpile = []; // Stockpile
     const foundations = []; // Foundations for the game
     const revealedCards = []; // Area to hold revealed cards
-
     const columns = [[], [], [], [], [], [], []];
     const spacingX = 70;
     const spacingY = 40;
     const startX = 80;
     const startY = 300;
-
     const stockpileX = 80;
     const stockpileY = 190;
-
     const revealedX = 180;
     const revealedY = 190;
 
