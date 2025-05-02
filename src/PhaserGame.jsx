@@ -59,9 +59,6 @@ const PhaserGame = () => {
     const revealedCards = []; // Area to hold revealed cards
 
     const columns = [[], [], [], [], [], [], []];
-
-    const rows = 7;
-    const cols = 7;
     const spacingX = 70;
     const spacingY = 40;
     const startX = 80;
@@ -115,7 +112,6 @@ const PhaserGame = () => {
 
     // Deal cards to tableau (7 columns)
     const lastCardsInColumn = [];
-    const allCards = [...tableau, ...stockpile]; // Combine tableau and stockpile for easy access
     let tableauIndex = 0;
 
         // Shuffle the card positions (this is a simple random shuffle for the animation)
