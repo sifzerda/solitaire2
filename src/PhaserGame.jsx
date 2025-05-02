@@ -32,12 +32,7 @@ const PhaserGame = () => {
   const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
 
   // Build full deck
-  let deck = [];
-  ranks.forEach(rank => {
-    suits.forEach(suit => {
-      deck.push({ rank, suit });
-    });
-  });
+  const deck = ranks.flatMap(rank => suits.map(suit => ({ rank, suit })));
 
   function shuffleDeck(array) {
     for (let i = array.length - 1; i > 0; i--) {
